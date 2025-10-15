@@ -34,7 +34,7 @@ functions:
 
    1.2.1. addEdge(neighbor: str, distance: float) - adds new edge between nodes;
 
-&nbsp;  1.2.2. toString - converts Node to the format {Node(node name, coordinates=node coordinates, isBuilding=true/false)}.
+   1.2.2. toString - converts Node to the format {Node(node name, coordinates=node coordinates, isBuilding=true/false)}.
 
 
 
@@ -54,5 +54,7 @@ functions:
 
    2.2.1. addNode(name: str, coordinates: tuple\[float, float], subgraph=None, isBuilding: bool = False) - adds the node to in the graph;
 
-   2.2.2. addEdge(name1: str, name2: str, distance: float, bidirectional: bool = True) - adds the edge between nodes. In the case of further deployment, the attribute "bidirectional" can be very useful, since the distance (or time) from point A to point B will not always be the same as the distance from point B to point A (for example, traffic jams can affect the choice of route).
+   2.2.2. addEdge(name1: str, name2: str, distance: float, bidirectional: bool = True) - adds the edge between nodes. In the case of further deployment, the attribute "bidirectional" can be very useful, since the distance (or time) from point A to point B will not always be the same as the distance from point B to point A (for example, traffic jams can affect the choice of route);
+
+&nbsp;  2.2.3. dijkstra(start: string|Node) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm.
 
