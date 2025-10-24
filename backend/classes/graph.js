@@ -30,7 +30,7 @@ class Graph {
      * @param {boolean} bidirectional
      * @returns {Promise<void>}
      */
-    async addEdge(name1, name2, distance, bidirectional= true) {
+    async addEdge(name1, name2, distance, bidirectional = true) {
         if (!this.nodes.has(name1) || !this.nodes.has(name2)) {
             throw new Error(`addEdge: one of nodes not found: ${name1}, ${name2}`);
         }
@@ -139,6 +139,21 @@ class Graph {
             result[node.name] = { distance: info.distance, path: info.path };
         }
         return result;
+    }
+
+    /**
+     * Compute the shortest paths from every node using Dijkstra.
+     * Returns: { fromNodeName: { toNodeName: {distance, path} } }
+     */
+    async dijkstraAll() {
+        const results = {};
+        const nodeNames = Array.from(this.nodes.keys());
+
+        for (const name of nodeNames) {
+            results[name] = await this.dijkstra(name);
+        }
+
+        return results;
     }
 }
 

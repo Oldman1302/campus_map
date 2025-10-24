@@ -14,15 +14,28 @@ async function test(startNode) {
 
     // Dijkstra evaluation
     console.log(`\nRunning Dijkstra from ${startNode}...`);
-    console.log("____________________________________________________")
+    console.log("____________________________________________________");
 
-    const t0 = performance.now();
+    let t0 = performance.now();
     await graph.dijkstra(startNode);
-    const t1 = performance.now();
+    let t1 = performance.now();
 
-    console.log(`Computed shortest paths from ${startNode} to all nodes.`)
+    console.log(`Computed shortest paths from ${startNode} to all nodes.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log("____________________________________________________")
+    console.log("____________________________________________________");
+
+
+    // Dijkstra for all nodes
+    console.log(`\n\nRunning Dijkstra from all nodes...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    await graph.dijkstraAll();
+    t1 = performance.now();
+
+    console.log(`Computed all-pairs shortest paths.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log("____________________________________________________");
 }
 
 test("City1").catch(err => console.error(err));
