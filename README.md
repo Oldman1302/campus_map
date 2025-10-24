@@ -56,5 +56,13 @@ functions:
 
    2.2.2. addEdge(name1: str, name2: str, distance: float, bidirectional: bool = True) - adds the edge between nodes. In the case of further deployment, the attribute "bidirectional" can be very useful, since the distance (or time) from point A to point B will not always be the same as the distance from point B to point A (for example, traffic jams can affect the choice of route);
 
-&nbsp;  2.2.3. dijkstra(start: string|Node) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm.
+   2.2.3. dijkstra(start: string|Node) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm;
+
+&nbsp;  2.2.4. dijkstraAll() - computes the shortest paths from each node to others by Dijkstra's algorithm.
+
+
+
+\*reference:
+
+test №1. cities and distances between them (undirected weighted graph) https://www.kaggle.com/code/alexkhr/many-graph-algorithms/input (/backend/tests/mst/MST.csv)
 
