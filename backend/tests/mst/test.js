@@ -36,6 +36,19 @@ async function test(startNode) {
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
     console.log("____________________________________________________");
+
+
+    // Floyd-Warshall Algorithm for all nodes distance
+    console.log(`\n\nRunning Floyd-Warshall Algorithm...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    await graph.floydWarshall();
+    t1 = performance.now();
+
+    console.log(`Computed all shortest paths.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log("____________________________________________________");
 }
 
 test("City1").catch(err => console.error(err));

@@ -132,6 +132,8 @@ class Graph {
 
             // Convert to plain object { nodeName: {distance, path} }
         }
+
+        // Format result
         const result = {};
         for (const [node, info] of distances.entries()) {
             if (node.name === startNode.name) continue;
@@ -154,6 +156,76 @@ class Graph {
         }
 
         return results;
+    }
+
+    /**
+     *  * Floyd–Warshall algorithm for all-pairs shortest paths.
+     * Returns object { fromNodeName: { toNodeName: {distance, path} } }
+     */
+    async floydWarshall() {
+        const nodeNames = Array.from(this.nodes.keys());
+
+        // Initialize distance and next distance matrices
+        const dist = {};
+        const nextHop = {};
+
+        for (const nodeI of nodeNames) {
+            dist[nodeI] = {};
+            nextHop[nodeI] = {};
+            for (const nodeJ of nodeNames) {
+                if (nodeI === nodeJ) dist[nodeI][nodeJ] = 0;
+                else dist[nodeI][nodeJ] = Number.POSITIVE_INFINITY;
+                nextHop[nodeI][nodeJ] = null;
+            }
+        }
+
+        // Fill distances from edges
+        for (const [name, node] of this.nodes.entries()) {
+            for (const [neighbor, weight] of node.edges.entries()) {
+                dist[name][neighbor.name] = weight;
+                nextHop[name][neighbor.name] = neighbor.name;
+            }
+        }
+
+        // Main triple loop
+        for (const nodeK of nodeNames) {
+            for (const nodeI of nodeNames) {
+                for (const nodeJ of nodeNames) {
+                    if (dist[nodeI][nodeK] + dist[nodeK][nodeJ] < dist[nodeI][nodeJ]){
+                        dist[nodeI][nodeJ] = dist[nodeI][nodeK] + dist[nodeK][nodeJ];
+                        nextHop[nodeI][nodeJ] = nextHop[nodeI][nodeK];
+                    }
+                }
+            }
+        }
+
+        // Reconstruct paths
+        function buildPath(i, j) {
+            if (nextHop[i][j] === null) return [];
+            const path = [i];
+            while (i !== j) {
+                i = nextHop[i][j];
+                path.push(i);
+            }
+            return path;
+        }
+
+        // Format result
+        const result = {};
+        for (const nodeI of nodeNames) {
+            result[nodeI] = {};
+            for (const nodeJ of nodeNames) {
+                if (nodeI === nodeJ) continue;
+                const pathArr = buildPath(nodeI, nodeJ);
+                const pathStr = pathArr.length ? pathArr.join(" -> ") : "";
+                result[nodeI][nodeJ] = {
+                    distance: dist[nodeI][nodeJ],
+                    path: pathStr
+                }
+            }
+        }
+
+        return result;
     }
 }
 
