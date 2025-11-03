@@ -24,6 +24,17 @@ async function test(startNode) {
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
     console.log("____________________________________________________");
 
+    // Bellman-Ford evaluation
+    console.log(`\nRunning Bellman-Ford from ${startNode}...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    await graph.bellmanFord(startNode);
+    t1 = performance.now();
+
+    console.log(`Computed shortest paths from ${startNode} to all nodes.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log("____________________________________________________");
 
     // Dijkstra for all nodes
     console.log(`\n\nRunning Dijkstra from all nodes...`);
@@ -37,6 +48,17 @@ async function test(startNode) {
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
     console.log("____________________________________________________");
 
+    // Bellman-Ford for all nodes
+    console.log(`\n\nRunning Bellman-Ford from all nodes...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    await graph.bellmanFordAll();
+    t1 = performance.now();
+
+    console.log(`Computed all-pairs shortest paths.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log("____________________________________________________");
 
     // Floyd-Warshall Algorithm for all nodes distance
     console.log(`\n\nRunning Floyd-Warshall Algorithm...`);

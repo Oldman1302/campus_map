@@ -144,6 +144,83 @@ class Graph {
     }
 
     /**
+     * Bellman–Ford algorithm with path reconstruction.
+     * Supports negative edge weights.
+     * Returns: { nodeName: { distance: number, path: string } }
+     *
+     * @param {string|Node} start
+     * @returns {Promise<Object<string, {distance:number, path:string}>>}
+     */
+    // In the future: you can add handler for negative edges
+    async bellmanFord(start) {
+        // Resolve start to Node instance
+        let startNode;
+        if  (typeof start === 'string') {
+            if (!this.nodes.has(start)) throw new Error(`Start node '${start}' not found`);
+            startNode = this.nodes.get(start);
+        } else if (start instanceof Node) {
+            if (!this.nodes.has(start.name) || this.nodes.get(start.name) !== start) throw new Error(`Start node '${start.name}' not found`);
+            startNode = start;
+        }
+        else {
+            throw new Error('start must be node name (string) or Node object');
+        }
+
+        const nodeNames = Array.from(this.nodes.keys());
+        const nodeList = Array.from(this.nodes.values());
+
+        // Initialize distances and predecessors
+        const distances = {};
+        const predecessors = {};
+
+        for (const name of nodeNames) {
+            distances[name] = Number.POSITIVE_INFINITY;
+            predecessors[name] = null;
+        }
+        distances[startNode.name] = 0;
+
+        for (let i = 0; i < nodeList.length - 1; i++) {
+            let updated = false;
+            for (const [uName, uNode] of this.nodes.entries()) {
+                for (const [vNode, distance] of uNode.edges.entries()) {
+                    const vName = vNode.name;
+                    if (distances[uName] + distance < distances[vName]){
+                        distances[vName] = distances[uName] + distance;
+                        predecessors[vName] = uName;
+                        updated = true;
+                    }
+                }
+            }
+            if (!updated) break; // optimization: stop early
+        }
+
+        // Reconstruct paths
+        function buildPath(to) {
+            if (distances[to] === Number.POSITIVE_INFINITY) return [];
+            const path = [];
+            let curr = to;
+            while (curr !== null) {
+                path.unshift(curr);
+                curr = predecessors[curr];
+            }
+            return path;
+        }
+
+        // Format result
+        const result = {};
+        for (const name of nodeNames) {
+            if (name === startNode.name) continue;
+            const pathArr = buildPath(name);
+            result[name] = {
+                distance: distances[name],
+                path: pathArr.join(" -> ")
+            };
+        }
+
+        return result;
+    }
+
+    /**
      * Compute the shortest paths from every node using Dijkstra.
      * Returns: { fromNodeName: { toNodeName: {distance, path} } }
      */
@@ -153,6 +230,21 @@ class Graph {
 
         for (const name of nodeNames) {
             results[name] = await this.dijkstra(name);
+        }
+
+        return results;
+    }
+
+    /**
+     * Compute the shortest paths from every node using Bellman-Ford.
+     * Returns: { fromNodeName: { toNodeName: {distance, path} } }
+     */
+    async bellmanFordAll() {
+        const results = {};
+        const nodeNames = Array.from(this.nodes.keys());
+
+        for (const name of nodeNames) {
+            results[name] = await this.bellmanFord(name);
         }
 
         return results;
