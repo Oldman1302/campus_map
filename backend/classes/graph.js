@@ -182,6 +182,9 @@ class Graph {
         for (let i = 0; i < nodeList.length - 1; i++) {
             let updated = false;
             for (const [uName, uNode] of this.nodes.entries()) {
+                // If current node is a building (not the start), skip expanding neighbors
+                if (uNode.isBuilding && uName !== startNode.name) continue;
+
                 for (const [vNode, distance] of uNode.edges.entries()) {
                     const vName = vNode.name;
                     if (distances[uName] + distance < distances[vName]){
@@ -281,6 +284,10 @@ class Graph {
 
         // Main triple loop
         for (const nodeK of nodeNames) {
+            // If current node is a building (not the start), skip expanding neighbors
+            const nodeObj = this.nodes.get(nodeK);
+            if (nodeObj.isBuilding) continue;
+
             for (const nodeI of nodeNames) {
                 for (const nodeJ of nodeNames) {
                     if (dist[nodeI][nodeK] + dist[nodeK][nodeJ] < dist[nodeI][nodeJ]){
