@@ -144,30 +144,28 @@ class Graph {
     }
 
     /**
-     * Bellman–Ford algorithm with path reconstruction.
-     * Supports negative edge weights.
-     * Returns: { nodeName: { distance: number, path: string } }
+     * Base Bellman–Ford core used by both bellmanFord()
      *
-     * @param {string|Node} start
-     * @returns {Promise<Object<string, {distance:number, path:string}>>}
+     * @param {string|Node} start - Start node name or Node instance
+     * @param {Map<string, Node>|null} customNodes - Optional: custom node map (for Johnson’s extended graph)
+     * @returns {Promise<{ distances: Object<string, number>, predecessors: Object<string, string|null> }>}
      */
-    // In the future: you can add handler for negative edges
-    async bellmanFord(start) {
-        // Resolve start to Node instance
+    async bellmanFordBase(start, customNodes = null) {
+        // Resolve start node
         let startNode;
-        if  (typeof start === 'string') {
-            if (!this.nodes.has(start)) throw new Error(`Start node '${start}' not found`);
-            startNode = this.nodes.get(start);
+        const nodeMap = customNodes || this.nodes;
+        if (typeof start === 'string') {
+            if (!nodeMap.has(start)) throw new Error(`Start node '${start}' not found`);
+            startNode = nodeMap.get(start);
         } else if (start instanceof Node) {
-            if (!this.nodes.has(start.name) || this.nodes.get(start.name) !== start) throw new Error(`Start node '${start.name}' not found`);
+            if (!nodeMap.has(start.name)) throw new Error(`Start node '${start.name}' not found`);
             startNode = start;
-        }
-        else {
-            throw new Error('start must be node name (string) or Node object');
+        } else {
+            throw new Error('startNode must be a string or Node object');
         }
 
-        const nodeNames = Array.from(this.nodes.keys());
-        const nodeList = Array.from(this.nodes.values());
+        const nodeList = Array.from(nodeMap.values());
+        const nodeNames = Array.from(nodeMap.keys());
 
         // Initialize distances and predecessors
         const distances = {};
@@ -181,7 +179,7 @@ class Graph {
 
         for (let i = 0; i < nodeList.length - 1; i++) {
             let updated = false;
-            for (const [uName, uNode] of this.nodes.entries()) {
+            for (const [uName, uNode] of nodeMap.entries()) {
                 // If current node is a building (not the start), skip expanding neighbors
                 if (uNode.isBuilding && uName !== startNode.name) continue;
 
@@ -196,6 +194,20 @@ class Graph {
             }
             if (!updated) break; // optimization: stop early
         }
+        return { distances, predecessors };
+    }
+
+    /**
+     * Bellman–Ford algorithm with path reconstruction.
+     * Supports negative edge weights.
+     * Returns: { nodeName: { distance: number, path: string } }
+     *
+     * @param {string|Node} start
+     * @returns {Promise<Object<string, {distance:number, path:string}>>}
+     */
+    // In the future: you can add handler for negative edges
+    async bellmanFord(start) {
+        const { distances, predecessors } = await this.bellmanFordBase(start);
 
         // Reconstruct paths
         function buildPath(to) {
@@ -211,12 +223,12 @@ class Graph {
 
         // Format result
         const result = {};
-        for (const name of nodeNames) {
-            if (name === startNode.name) continue;
+        for (const [name, distance] of Object.entries(distances)) {
+            if (name === (typeof start === 'string' ? start : start.name)) continue;
             const pathArr = buildPath(name);
             result[name] = {
-                distance: distances[name],
-                path: pathArr.join(" -> ")
+                distance: distance,
+                path: buildPath(name).join(' -> ')
             };
         }
 
@@ -326,6 +338,20 @@ class Graph {
 
         return result;
     }
+
+    // /**
+    //  * Johnson's Algorithm for all-pairs shortest paths.
+    //  * Returns object { fromNodeName: { toNodeName: {distance, path} } }
+    //  */
+    // async johnson() {
+    //     // Add temporary node q connected to all nodes with 0-weight edges
+    //     const S = new Node('S', [0, 0], null, false)
+    //     for (const node of this.nodes.values()) q.addEdge(node, 0);
+    //
+    //     // Build extended graph (copy)
+    //     const extended = new Map(this.nodes);
+    //     extended.set(q.name, q);
+    // }
 }
 
 module.exports = Graph;
