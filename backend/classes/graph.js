@@ -225,7 +225,6 @@ class Graph {
         const result = {};
         for (const [name, distance] of Object.entries(distances)) {
             if (name === (typeof start === 'string' ? start : start.name)) continue;
-            const pathArr = buildPath(name);
             result[name] = {
                 distance: distance,
                 path: buildPath(name).join(' -> ')
@@ -339,19 +338,62 @@ class Graph {
         return result;
     }
 
-    // /**
-    //  * Johnson's Algorithm for all-pairs shortest paths.
-    //  * Returns object { fromNodeName: { toNodeName: {distance, path} } }
-    //  */
-    // async johnson() {
-    //     // Add temporary node q connected to all nodes with 0-weight edges
-    //     const S = new Node('S', [0, 0], null, false)
-    //     for (const node of this.nodes.values()) q.addEdge(node, 0);
-    //
-    //     // Build extended graph (copy)
-    //     const extended = new Map(this.nodes);
-    //     extended.set(q.name, q);
-    // }
+    /**
+     * Johnson's Algorithm for all-pairs shortest paths.
+     * Efficient for sparse graphs and supports negative edge weights
+     * @returns {Promise<Object<string, Object<string, {distance:number, path:string}>>>}
+     */
+    async johnson() {
+        // Add temporary node S connected to all nodes with 0-weight edges
+        const S = new Node('S', [0, 0], null, false)
+        for (const node of this.nodes.values()) await S.addEdge(node, 0)
+
+        // Build extended graph (copy)
+        const extended = new Map(this.nodes);
+        extended.set(S.name, S);
+
+        // run Bellman–Ford from S to get potential h
+        const { distances: h } = await this.bellmanFordBase('S', extended);
+
+        // Check for negative-weight cycles
+        for (const [uName, uNode] of extended.entries()) {
+            for (const [vNode, weight] of uNode.edges.entries()) {
+                if (h[uName] + weight < h[vNode.name]) {
+                    throw new Error('Graph contains a negative-weight cycle');
+                }
+            }
+        }
+
+        // reweight edges to eliminate negatives
+        const reweighted = new Map();
+        for (const [name, node] of this.nodes.entries()) {
+            const newNode = new Node(name, node.coordinates, node.subgraph, node.isBuilding);
+            for (const [neighbor, weight] of node.edges.entries()) {
+                const newWeight = weight + h[name] - h[neighbor.name];
+                await newNode.addEdge(neighbor, newWeight);
+            }
+            reweighted.set(name, newNode);
+        }
+
+        // run Dijkstra from each node
+        const result = {};
+        for (const [uName, uNode] of reweighted.entries()) {
+            // Skip buildings as starting points
+            if (uNode.isBuilding) continue;
+
+            const dijkstraResult = await this.dijkstra(uName);
+
+            result[uName] = {};
+            for (const [vName, { distance, path }] of Object.entries(dijkstraResult)) {
+                const realDist = distance + h[vName] - h[uName];
+                result[uName][vName] = {
+                    distance: realDist,
+                    path
+                };
+            }
+        }
+        return result;
+    }
 }
 
 module.exports = Graph;

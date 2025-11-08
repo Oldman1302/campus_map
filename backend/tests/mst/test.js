@@ -71,6 +71,18 @@ async function test(startNode) {
     console.log(`Computed all shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
     console.log("____________________________________________________");
+
+    // Johnson's Algorithm for all nodes distance
+    console.log(`\n\nRunning Johnson's Algorithm...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    await graph.johnson();
+    t1 = performance.now();
+
+    console.log(`Computed all shortest paths.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log("____________________________________________________");
 }
 
 test("City1").catch(err => console.error(err));
