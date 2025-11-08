@@ -150,7 +150,7 @@ class Graph {
      * @param {Map<string, Node>|null} customNodes - Optional: custom node map (for Johnson’s extended graph)
      * @returns {Promise<{ distances: Object<string, number>, predecessors: Object<string, string|null> }>}
      */
-    async bellmanFordBase(start, customNodes = null) {
+    async #bellmanFordBase(start, customNodes = null) {
         // Resolve start node
         let startNode;
         const nodeMap = customNodes || this.nodes;
@@ -207,7 +207,7 @@ class Graph {
      */
     // In the future: you can add handler for negative edges
     async bellmanFord(start) {
-        const { distances, predecessors } = await this.bellmanFordBase(start);
+        const { distances, predecessors } = await this.#bellmanFordBase(start);
 
         // Reconstruct paths
         function buildPath(to) {
@@ -353,7 +353,7 @@ class Graph {
         extended.set(S.name, S);
 
         // run Bellman–Ford from S to get potential h
-        const { distances: h } = await this.bellmanFordBase('S', extended);
+        const { distances: h } = await this.#bellmanFordBase('S', extended);
 
         // Check for negative-weight cycles
         for (const [uName, uNode] of extended.entries()) {
