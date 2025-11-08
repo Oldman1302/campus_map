@@ -58,13 +58,17 @@ functions:
 
    2.2.3. dijkstra(start: string|Node) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm;
 
-&nbsp;  2.2.4. bellmanFord(start: string|Node) - finds the shortest paths from node Start to other nodes by Bellman–Ford's algorithm;
+   2.2.4. bellmanFordBase(start: str, customNodes = null: Map<string, Node>) - Internal helper for Bellman–Ford algorithm base logic. Used by both Bellman–Ford and Johnson’s algorithms.
 
-   2.2.5. dijkstraAll() - computes the shortest paths from each node to others by Dijkstra's algorithm;
+&nbsp;  2.2.5. bellmanFord(start: str|Node) - finds the shortest paths from node Start to other nodes by Bellman–Ford's algorithm;
 
-&nbsp;  2.2.6. bellmanFordAll() - computes the shortest paths from each node to others by Bellman–Ford's algorithm;
+   2.2.6. dijkstraAll() - computes the shortest paths from each node to others by Dijkstra's algorithm;
 
-   2.2.7. floydWarshall() algorithm - computes the shortest paths from each node to others by Floyd–Warshall algorithm.
+   2.2.7. bellmanFordAll() - computes the shortest paths from each node to others by Bellman–Ford's algorithm;
+
+   2.2.8. floydWarshall() - computes the shortest paths from each node to others by Floyd–Warshall algorithm;
+
+&nbsp;  2.2.9. johnson() - computes the shortest paths from each node to others by Johnson algorithm.
 
 
 
