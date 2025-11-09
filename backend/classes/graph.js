@@ -42,6 +42,15 @@ class Graph {
         }
     }
 
+    // /**
+    //  * Delete a node from the graph by its name
+    //  * @param {string} id
+    //  * @returns null
+    //  */
+    // async deleteNode(id) {
+    //
+    // }
+    //
     toString() {
         const lines = [`Graph(${this.name}):`];
         for (const node of this.nodes.values()) {
