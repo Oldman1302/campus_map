@@ -21,6 +21,32 @@ class Node {
     async addEdge(neighbor, distance) {
         this.edges.set(neighbor, distance);
     }
+
+    /**
+     * Remove outgoing edge from this node
+     *
+     * @param {string|Node} neighbor
+     * @returns {Promise<boolean>} true if edge existed and was removed
+     */
+    async deleteEdge(neighbor) {
+        let neighborNode;
+        if (typeof neighbor === 'string') {
+            for (const node of this.edges.keys()) {
+                if (node.name === neighbor) {
+                    neighborNode = node;
+                    break;
+                }
+            }
+        } else if (neighbor instanceof Node) {
+            neighborNode = neighbor;
+        } else {
+            throw new Error('Node must be string or Node object');
+        }
+
+        if (!neighborNode) return false;
+
+        return this.edges.delete(neighborNode);
+    }
 }
 
 module.exports = Node;

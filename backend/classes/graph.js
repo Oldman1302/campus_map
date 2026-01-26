@@ -42,15 +42,53 @@ class Graph {
         }
     }
 
-    // /**
-    //  * Delete a node from the graph by its name
-    //  * @param {string} id
-    //  * @returns null
-    //  */
-    // async deleteNode(id) {
-    //
-    // }
-    //
+    /**
+     * Delete an edge from the graph
+     *
+     *  * @param {string|Node} from
+     *  * @param {string|Node} to
+     *  * @returns {Promise<boolean>} true if edge existed and was removed
+     */
+    async deleteEdge(from, to) {
+        let fromNode;
+
+        if (typeof from === 'string') {
+            fromNode = this.nodes.get(from);
+        } else if (from instanceof Node) {
+            fromNode = from;
+        } else {
+            throw new Error('Node must be string or Node object');
+        }
+
+        return await fromNode.deleteEdge(to);
+    }
+
+    /**
+     * Delete a node from the graph by its name (and all edges connected to it)
+
+     * @param {string} target
+     * @returns {Promise<boolean>} true if node existed and was removed
+     */
+    async deleteNode(target) {
+        let node;
+
+        if (typeof target === 'string') {
+            node = this.nodes.get(target);
+        } else if (target instanceof Node) {
+            node = target;
+        } else {
+            throw new Error('Node must be string or Node object');
+        }
+
+        for (const n of this.nodes.values()) {
+            await n.deleteEdge(node);
+        }
+
+        node.edges.clear();
+
+        return this.nodes.delete(node.name);
+    }
+
     toString() {
         const lines = [`Graph(${this.name}):`];
         for (const node of this.nodes.values()) {
@@ -153,7 +191,7 @@ class Graph {
     }
 
     /**
-     * Base Bellman–Ford core used by both bellmanFord()
+     * Base Bellman–Ford core used by both bellmanFord() and johnson()
      *
      * @param {string|Node} start - Start node name or Node instance
      * @param {Map<string, Node>|null} customNodes - Optional: custom node map (for Johnson’s extended graph)
