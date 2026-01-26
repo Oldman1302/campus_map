@@ -34,7 +34,9 @@ functions:
 
    1.2.1. addEdge(neighbor: str, distance: float) - adds new edge between nodes;
 
-   1.2.2. toString - converts Node to the format {Node(node name, coordinates=node coordinates, isBuilding=true/false)}.
+   1.2.2. deleteEdge(neighbor: str|Node) - removes outgoing edge "neighbor" from this node and returns true if edge existed and was removed
+
+   1.2.3. toString - converts Node to the format {Node(node name, coordinates=node coordinates, isBuilding=true/false)}.
 
 
 
@@ -56,19 +58,23 @@ functions:
 
    2.2.2. addEdge(name1: str, name2: str, distance: float, bidirectional: bool = True) - adds the edge between nodes. In the case of further deployment, the attribute "bidirectional" can be very useful, since the distance (or time) from point A to point B will not always be the same as the distance from point B to point A (for example, traffic jams can affect the choice of route);
 
-   2.2.3. dijkstra(start: string|Node) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm;
+   2.2.3. deleteEdge(from: str|node, to: str|Node) - delete an edge from the graph and returns true if edge existed and was removed
 
-   2.2.4. bellmanFordBase(start: str, customNodes = null: Map<string, Node>) - Internal helper for Bellman–Ford algorithm base logic. Used by both Bellman–Ford and Johnson’s algorithms.
+&nbsp;  2.2.4. deleteNode(target: str|Node) - Delete a node from the graph by its name (and all edges connected to it) and returns true if node existed and was removed
 
-&nbsp;  2.2.5. bellmanFord(start: str|Node) - finds the shortest paths from node Start to other nodes by Bellman–Ford's algorithm;
+&nbsp;  2.2.5. dijkstra(start: string|Node) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm;
 
-   2.2.6. dijkstraAll() - computes the shortest paths from each node to others by Dijkstra's algorithm;
+   2.2.6. bellmanFordBase(start: str, customNodes = null: Map<string, Node>) - Internal helper for Bellman–Ford algorithm base logic. Used by both Bellman–Ford and Johnson’s algorithms.
 
-   2.2.7. bellmanFordAll() - computes the shortest paths from each node to others by Bellman–Ford's algorithm;
+   2.2.7. bellmanFord(start: str|Node) - finds the shortest paths from node Start to other nodes by Bellman–Ford's algorithm;
 
-   2.2.8. floydWarshall() - computes the shortest paths from each node to others by Floyd–Warshall algorithm;
+   2.2.8. dijkstraAll() - computes the shortest paths from each node to others by Dijkstra's algorithm;
 
-&nbsp;  2.2.9. johnson() - computes the shortest paths from each node to others by Johnson algorithm.
+   2.2.9. bellmanFordAll() - computes the shortest paths from each node to others by Bellman–Ford's algorithm;
+
+   2.2.10. floydWarshall() - computes the shortest paths from each node to others by Floyd–Warshall algorithm;
+
+   2.2.11. johnson() - computes the shortest paths from each node to others by Johnson algorithm.
 
 
 
