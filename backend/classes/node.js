@@ -17,9 +17,13 @@ class Node {
      * Add an edge from this node to neighbor with given distance.
      * @param {Node} neighbor
      * @param {number} distance
+     * @param {number} time
      */
-    async addEdge(neighbor, distance) {
-        this.edges.set(neighbor, distance);
+    async addEdge(neighbor, distance, time) {
+        this.edges.set(neighbor, {
+            distance: distance,
+            time: time
+        });
     }
 
     /**

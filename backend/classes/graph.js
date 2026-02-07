@@ -7,6 +7,7 @@ class Graph {
     constructor(name) {
         this.name = name;
         this.nodes = new Map();
+        this.weightStrategy = edge => edge.distance;
     }
 
     /**
@@ -27,18 +28,19 @@ class Graph {
      * @param {string} name1
      * @param {string} name2
      * @param {number} distance
+     * @param {number} time
      * @param {boolean} bidirectional
      * @returns {Promise<void>}
      */
-    async addEdge(name1, name2, distance, bidirectional = true) {
+    async addEdge(name1, name2, distance, time, bidirectional = true) {
         if (!this.nodes.has(name1) || !this.nodes.has(name2)) {
             throw new Error(`addEdge: one of nodes not found: ${name1}, ${name2}`);
         }
         const node1 = this.nodes.get(name1);
         const node2 = this.nodes.get(name2);
-        await node1.addEdge(node2, distance);
+        await node1.addEdge(node2, distance, time);
         if (bidirectional) {
-            await node2.addEdge(node1, distance);
+            await node2.addEdge(node1, distance, time);
         }
     }
 
@@ -89,12 +91,21 @@ class Graph {
         return this.nodes.delete(node.name);
     }
 
+    /**
+     * Set weight calculation strategy
+     *
+     * @param {(edge: {distance:number, time:number}) => number} strategy
+     */
+    setWeightStrategy(strategy) {
+        this.weightStrategy = strategy;
+    }
+
     toString() {
         const lines = [`Graph(${this.name}):`];
         for (const node of this.nodes.values()) {
             const neighbors = [];
-            for (const [neighbor, distance] of node.edges.entries()) {
-                neighbors.push(`${neighbor.name}: ${distance}`);
+            for (const [neighbor, data] of node.edges.entries()) {
+                neighbors.push(`${neighbor.name}: distance = ${data.distance}, time  = ${data.time}`);
             }
             lines.push(`    ${node.name} ${JSON.stringify(node.coordinates)} ${neighbors.length ?  "-> " + neighbors.join(', ').toString() : ""}`)
         }
@@ -110,9 +121,10 @@ class Graph {
      * { nodeName: { distance: Number, path: "A -> B -> C" } }
      *
      * @param {string|Node} start
+     * @param {string} weightStrategy
      * @returns {Promise<Object<string, {distance:number, path:string}>>}
      */
-    async dijkstra(start) {
+    async dijkstra(start, weightStrategy) {
         // Resolve start to Node instance
         let startNode;
         if  (typeof start === 'string') {
@@ -129,33 +141,45 @@ class Graph {
         // Build unvisited set of Node objects
         const unvisited = new Set(this.nodes.values());
 
-        // distances: Map<Node, {distance: number, path: string}>
+        // distances: Map<Node, {primary: number, secondary: number, path: string}>
         // +inf for everyone, 0 for start_node
         const distances = new Map();
         for (const node of unvisited) {
-            distances.set(node, { distance: Number.POSITIVE_INFINITY, path: '' });
+            distances.set(node, {
+                primary: Number.POSITIVE_INFINITY,
+                secondary: Number.POSITIVE_INFINITY,
+                path: ''
+            });
         }
-        distances.set(startNode, {distance: 0.0, path: startNode.name});
+
+        distances.set(startNode, {
+            primary: 0.0,
+            secondary: 0.0,
+            path: startNode.name
+        });
+
+        const secondWeightStrategy = weightStrategy === "distance" ? "time" : "distance";
 
         while (unvisited.size > 0) {
-            // # Find unvisited node with the smallest tentative distance
+            // Find unvisited node with the smallest tentative distance
             let current = null;
-            let minDistance = Number.POSITIVE_INFINITY;
+            let minPrimary = Number.POSITIVE_INFINITY;
             for (const node of unvisited) {
                 let info = distances.get(node) || {distance: Number.POSITIVE_INFINITY};
-                if (info.distance < minDistance) {
-                    minDistance = info.distance;
+                if (info.primary < minPrimary) {
+                    minPrimary = info.primary;
                     current = node;
                 }
             }
 
             // If no reachable unvisited node remains - stop the loop
-            if (current === null || distances.get(current).distance === Number.POSITIVE_INFINITY) {
+            if (current === null || distances.get(current).primary === Number.POSITIVE_INFINITY) {
                 break;
             }
 
             const currentInfo = distances.get(current);
-            const currentDistance = currentInfo.distance;
+            const currentPrimary = currentInfo.primary;
+            const currentSecondary = currentInfo.secondary;
             const currentPath = currentInfo.path;
 
             // If current node is a building (not the start), skip expanding neighbors
@@ -165,19 +189,28 @@ class Graph {
             }
 
             // Update neighbor distances
-            for (const [neighbor, weight] of current.edges.entries()) {
+            for (const [neighbor, edgeData] of current.edges.entries()) {
                 if (!unvisited.has(neighbor)) continue;
-                const tentative = currentDistance + weight;
-                const neighborInfo = distances.get(neighbor) || { distance: Number.POSITIVE_INFINITY, path: '' };
-                if (tentative < neighborInfo.distance) {
-                    distances.set(neighbor, { distance: tentative, path: currentPath + ' -> ' + neighbor.name });
+
+                const primaryWeight =  edgeData[weightStrategy];
+                const secondaryWeight = edgeData[secondWeightStrategy];
+
+                const tentativePrimary = currentPrimary + primaryWeight;
+                const tentativeSecondary = currentSecondary + secondaryWeight;
+
+                const neighborInfo = distances.get(neighbor);
+
+                if (tentativePrimary < neighborInfo.primary) {
+                    distances.set(neighbor, {
+                        primary: tentativePrimary,
+                        secondary: tentativeSecondary,
+                        path: currentPath + ' -> ' + neighbor.name
+                    });
                 }
             }
 
             // mark current visited
             unvisited.delete(current);
-
-            // Convert to plain object { nodeName: {distance, path} }
         }
 
         // Format result
@@ -185,7 +218,11 @@ class Graph {
         for (const [node, info] of distances.entries()) {
             if (node.name === startNode.name) continue;
             // if path is empty and distance is Infinity, we keep path as empty string
-            result[node.name] = { distance: info.distance, path: info.path };
+            result[node.name] = {
+                [weightStrategy]: info.primary || 0,
+                [secondWeightStrategy]: info.secondary || 0,
+                path: info.path
+            };
         }
         return result;
     }

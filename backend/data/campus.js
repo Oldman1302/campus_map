@@ -100,7 +100,7 @@ const dgram = require("node:dgram");
     console.log(campus.toString());
 
     // Run Dijkstra from Dormitory №20 Entrance 2
-    const result = await campus.dijkstra('Dormitory №20 Entrance 2');
+    const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'distance');
 
     console.log(result['East gate']); // print the specific node result
 })()
