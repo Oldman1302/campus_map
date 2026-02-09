@@ -124,4 +124,11 @@ const dgram = require("node:dgram");
 
     console.log('\n\nbellmanFordAll:')
     console.log(resultBellmanFordAll["Dormitory №20 Entrance 2"]['East gate']);
+
+
+    // Run floydWarshall for all nodes
+    const floydWarshall = await campus.floydWarshall('time');
+
+    console.log('\n\nfloydWarshall:')
+    console.log(resultBellmanFordAll["Dormitory №20 Entrance 2"]['East gate']);
 })()

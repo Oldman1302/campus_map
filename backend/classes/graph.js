@@ -378,29 +378,42 @@ class Graph {
 
     /**
      *  * Floyd–Warshall algorithm for all-pairs shortest paths.
-     * Returns object { fromNodeName: { toNodeName: {distance, path} } }
+     *
+     *  @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * Returns object { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
      */
-    async floydWarshall() {
+    async floydWarshall(weightStrategy) {
         const nodeNames = Array.from(this.nodes.keys());
 
-        // Initialize distance and next distance matrices
-        const dist = {};
+        // Initialize matrices
+        const primary = {};
+        const secondary = {};
         const nextHop = {};
 
         for (const nodeI of nodeNames) {
-            dist[nodeI] = {};
+            primary[nodeI] = {};
+            secondary[nodeI] = {};
             nextHop[nodeI] = {};
             for (const nodeJ of nodeNames) {
-                if (nodeI === nodeJ) dist[nodeI][nodeJ] = 0;
-                else dist[nodeI][nodeJ] = Number.POSITIVE_INFINITY;
+                if (nodeI === nodeJ) {
+                    primary[nodeI][nodeJ] = 0;
+                    secondary[nodeI][nodeJ] = 0;
+                }
+                else {
+                    primary[nodeI][nodeJ] = Number.POSITIVE_INFINITY;
+                    secondary[nodeI][nodeJ] = Number.POSITIVE_INFINITY;
+                }
                 nextHop[nodeI][nodeJ] = null;
             }
         }
 
-        // Fill distances from edges
+        // Fill matrices from edges
         for (const [name, node] of this.nodes.entries()) {
-            for (const [neighbor, weight] of node.edges.entries()) {
-                dist[name][neighbor.name] = weight;
+            for (const [neighbor, edgeData] of node.edges.entries()) {
+                primary[name][neighbor.name] = edgeData[weightStrategy];
+                secondary[name][neighbor.name] = weightStrategy === 'distance'
+                    ? edgeData.time
+                    : edgeData.distance;
                 nextHop[name][neighbor.name] = neighbor.name;
             }
         }
@@ -413,8 +426,9 @@ class Graph {
 
             for (const nodeI of nodeNames) {
                 for (const nodeJ of nodeNames) {
-                    if (dist[nodeI][nodeK] + dist[nodeK][nodeJ] < dist[nodeI][nodeJ]){
-                        dist[nodeI][nodeJ] = dist[nodeI][nodeK] + dist[nodeK][nodeJ];
+                    if (primary[nodeI][nodeK] + primary[nodeK][nodeJ] < primary[nodeI][nodeJ]){
+                        primary[nodeI][nodeJ] = primary[nodeI][nodeK] + primary[nodeK][nodeJ];
+                        secondary[nodeI][nodeJ] = secondary[nodeI][nodeK] + secondary[nodeK][nodeJ];
                         nextHop[nodeI][nodeJ] = nextHop[nodeI][nodeK];
                     }
                 }
@@ -441,7 +455,12 @@ class Graph {
                 const pathArr = buildPath(nodeI, nodeJ);
                 const pathStr = pathArr.length ? pathArr.join(" -> ") : "";
                 result[nodeI][nodeJ] = {
-                    distance: dist[nodeI][nodeJ],
+                    distance: weightStrategy === "distance"
+                    ? primary[nodeI][nodeJ]
+                    : secondary[nodeI][nodeJ],
+                    time: weightStrategy === "distance"
+                        ? secondary[nodeI][nodeJ]
+                        : primary[nodeI][nodeJ],
                     path: pathStr
                 }
             }

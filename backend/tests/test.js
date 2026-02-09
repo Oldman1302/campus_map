@@ -16,10 +16,11 @@ async function test(graph, startNode) {
     console.log("____________________________________________________");
 
     let t0 = performance.now();
-    await graph.dijkstra(startNode);
+    const result = await graph.dijkstra(startNode, "distance");
     let t1 = performance.now();
     console.log(`Computed shortest paths from ${startNode}.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result["City500"]);
     console.log("____________________________________________________");
 
     // --- Bellman-Ford from start ---
@@ -27,10 +28,11 @@ async function test(graph, startNode) {
     console.log("____________________________________________________");
 
     t0 = performance.now();
-    await graph.bellmanFord(startNode);
+    const result2 = await graph.bellmanFord(startNode, "distance");
     t1 = performance.now();
     console.log(`Computed shortest paths from ${startNode}.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result2["City500"]);
     console.log("____________________________________________________");
 
     // --- Dijkstra all-pairs ---
@@ -38,10 +40,11 @@ async function test(graph, startNode) {
     console.log("____________________________________________________");
 
     t0 = performance.now();
-    await graph.dijkstraAll();
+    const result3 = await graph.dijkstraAll("distance");
     t1 = performance.now();
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result3["City1"]["City500"]);
     console.log("____________________________________________________");
 
     // --- Bellman-Ford all-pairs ---
@@ -49,10 +52,11 @@ async function test(graph, startNode) {
     console.log("____________________________________________________");
 
     t0 = performance.now();
-    await graph.bellmanFordAll();
+    const result4 = await graph.bellmanFordAll("distance");
     t1 = performance.now();
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result4["City1"]["City500"]);
     console.log("____________________________________________________");
 
     // --- Floyd–Warshall ---
@@ -60,22 +64,23 @@ async function test(graph, startNode) {
     console.log("____________________________________________________");
 
     t0 = performance.now();
-    await graph.floydWarshall();
+    const result5 = await graph.floydWarshall("distance");
     t1 = performance.now();
     console.log(`Computed all shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result5["City1"]["City500"]);
     console.log("____________________________________________________");
 
-    // --- Johnson’s Algorithm ---
-    console.log(`\nRunning Johnson’s Algorithm...`);
-    console.log("____________________________________________________");
-
-    t0 = performance.now();
-    await graph.johnson();
-    t1 = performance.now();
-    console.log(`Computed all shortest paths.`);
-    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log("____________________________________________________");
+    // // --- Johnson’s Algorithm ---
+    // console.log(`\nRunning Johnson’s Algorithm...`);
+    // console.log("____________________________________________________");
+    //
+    // t0 = performance.now();
+    // await graph.johnson();
+    // t1 = performance.now();
+    // console.log(`Computed all shortest paths.`);
+    // console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    // console.log("____________________________________________________");
 }
 
 module.exports = { test };
