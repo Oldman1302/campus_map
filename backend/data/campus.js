@@ -48,59 +48,80 @@ const dgram = require("node:dgram");
     await campus.addNode('22.365503, 113.539959', [22.365503, 113.539959]);
     await campus.addNode('22.365175, 113.540113', [22.365175, 113.540113]);
 
-    await campus.addEdge('22.365503, 113.539959', '22.365495, 113.539687', 28);
-    await campus.addEdge('22.365445, 113.539863', '22.365435, 113.540232', 35);
-    await campus.addEdge('22.365457, 113.539686', '22.365443, 113.539570', 11);
-    await campus.addEdge('22.365457, 113.539686', '22.365445, 113.539863', 21);
-    await campus.addEdge('22.365443, 113.539570', '22.365201, 113.539570', 27);
-    await campus.addEdge('22.365201, 113.539570', '22.365189, 113.539670', 10);
-    await campus.addEdge('22.365189, 113.539670', '22.365164, 113.539925', 23);
-    await campus.addEdge('22.365823, 113.540177', '22.365748, 113.540189', 9);
-    await campus.addEdge('22.365748, 113.540189', '22.365507, 113.540227', 25);
-    await campus.addEdge('22.365435, 113.540232', '22.365263, 113.540263', 19);
-    await campus.addEdge('22.365435, 113.540232', '22.365507, 113.540227', 6);
-    await campus.addEdge('22.365263, 113.540263', '22.365162, 113.540256', 13);
-    await campus.addEdge('22.365175, 113.540113', '22.365162, 113.540256', 13);
-    await campus.addEdge('22.365175, 113.540113', '22.365165, 113.540014', 8);
-    await campus.addEdge('22.365164, 113.539925', '22.365165, 113.540014', 15);
-    await campus.addEdge('22.365162, 113.540256', '22.365144, 113.540375', 13);
-    await campus.addEdge('22.365144, 113.540375', '22.365168, 113.540755', 37);
-    await campus.addEdge('22.365168, 113.540755', '22.365130, 113.541179', 48);
-    await campus.addEdge('22.365130, 113.541179', '22.365130, 113.541675', 50);
-    await campus.addEdge('22.365130, 113.541675', '22.365123, 113.542061', 38);
-    await campus.addEdge('22.365123, 113.542061', '22.365147, 113.542328', 29);
-    await campus.addEdge('22.365147, 113.542328', '22.365145, 113.542593', 28);
-    await campus.addEdge('22.365145, 113.542593', '22.365135, 113.542967', 38);
-    await campus.addEdge('22.365135, 113.542967', '22.365163, 113.543197', 24);
-    await campus.addEdge('22.365163, 113.543197', '22.365159, 113.543665', 49);
-    await campus.addEdge('22.365159, 113.543665', '22.365489, 113.543882', 40);
-    await campus.addEdge('22.365489, 113.543882', '22.365812, 113.544095', 45);
-    await campus.addEdge('22.365812, 113.544095', '22.366066, 113.544259', 31);
-    await campus.addEdge('22.366066, 113.544259', '22.366182, 113.544300', 12);
-    await campus.addEdge('22.366475, 113.543623', '22.366319, 113.543953', 40);
-    await campus.addEdge('22.366319, 113.543953', '22.366182, 113.544300', 37);
-    await campus.addEdge('22.366319, 113.543953', 'Building T1', 16);
-    await campus.addEdge('22.367275, 113.544880', 'East gate', 42);
-    await campus.addEdge('22.367275, 113.544880', '22.366182, 113.544300', 138);
-    await campus.addEdge('22.365457, 113.539686', '22.365495, 113.539687', 5);
-    await campus.addEdge('Building T1', '22.366182, 113.544300', 41);
-    await campus.addEdge('Dormitory №16', '22.365168, 113.540755', 14);
-    await campus.addEdge('Dormitory №20 Entrance 1', '22.365189, 113.539670', 14);
-    await campus.addEdge('Dormitory №20 Entrance 2', '22.365164, 113.539925', 13);
-    await campus.addEdge('Dormitory №20 Entrance 3', '22.365165, 113.540014', 11);
-    await campus.addEdge('Dormitory №19 Entrance 1', '22.365189, 113.539670', 18);
-    await campus.addEdge('Dormitory №19 Entrance 2', '22.365164, 113.539925', 17);
-    await campus.addEdge('Dormitory №19 Entrance 2', '22.365445, 113.539863', 13);
-    await campus.addEdge('Dormitory №19 Entrance 3', '22.365175, 113.540113', 19);
+    await campus.addEdge('22.365503, 113.539959', '22.365495, 113.539687', 28, 2);
+    await campus.addEdge('22.365445, 113.539863', '22.365435, 113.540232', 35, 2);
+    await campus.addEdge('22.365457, 113.539686', '22.365443, 113.539570', 11, 2);
+    await campus.addEdge('22.365457, 113.539686', '22.365445, 113.539863', 21, 2);
+    await campus.addEdge('22.365443, 113.539570', '22.365201, 113.539570', 27, 2);
+    await campus.addEdge('22.365201, 113.539570', '22.365189, 113.539670', 10, 2);
+    await campus.addEdge('22.365189, 113.539670', '22.365164, 113.539925', 23, 2);
+    await campus.addEdge('22.365823, 113.540177', '22.365748, 113.540189', 9, 2);
+    await campus.addEdge('22.365748, 113.540189', '22.365507, 113.540227', 25, 2);
+    await campus.addEdge('22.365435, 113.540232', '22.365263, 113.540263', 19, 2);
+    await campus.addEdge('22.365435, 113.540232', '22.365507, 113.540227', 6, 2);
+    await campus.addEdge('22.365263, 113.540263', '22.365162, 113.540256', 13, 2);
+    await campus.addEdge('22.365175, 113.540113', '22.365162, 113.540256', 13, 2);
+    await campus.addEdge('22.365175, 113.540113', '22.365165, 113.540014', 8, 2);
+    await campus.addEdge('22.365164, 113.539925', '22.365165, 113.540014', 15, 2);
+    await campus.addEdge('22.365162, 113.540256', '22.365144, 113.540375', 13, 2);
+    await campus.addEdge('22.365144, 113.540375', '22.365168, 113.540755', 37, 2);
+    await campus.addEdge('22.365168, 113.540755', '22.365130, 113.541179', 48, 2);
+    await campus.addEdge('22.365130, 113.541179', '22.365130, 113.541675', 50, 2);
+    await campus.addEdge('22.365130, 113.541675', '22.365123, 113.542061', 38, 2);
+    await campus.addEdge('22.365123, 113.542061', '22.365147, 113.542328', 29, 2);
+    await campus.addEdge('22.365147, 113.542328', '22.365145, 113.542593', 28, 2);
+    await campus.addEdge('22.365145, 113.542593', '22.365135, 113.542967', 38, 1);
+    await campus.addEdge('22.365135, 113.542967', '22.365163, 113.543197', 24, 1);
+    await campus.addEdge('22.365163, 113.543197', '22.365159, 113.543665', 49, 1);
+    await campus.addEdge('22.365159, 113.543665', '22.365489, 113.543882', 40, 1);
+    await campus.addEdge('22.365489, 113.543882', '22.365812, 113.544095', 45, 1);
+    await campus.addEdge('22.365812, 113.544095', '22.366066, 113.544259', 31, 1);
+    await campus.addEdge('22.366066, 113.544259', '22.366182, 113.544300', 12, 1);
+    await campus.addEdge('22.366475, 113.543623', '22.366319, 113.543953', 40, 1);
+    await campus.addEdge('22.366319, 113.543953', '22.366182, 113.544300', 37, 1);
+    await campus.addEdge('22.366319, 113.543953', 'Building T1', 16, 1);
+    await campus.addEdge('22.367275, 113.544880', 'East gate', 42, 3);
+    await campus.addEdge('22.367275, 113.544880', '22.366182, 113.544300', 138, 3);
+    await campus.addEdge('22.365457, 113.539686', '22.365495, 113.539687', 5, 3);
+    await campus.addEdge('Building T1', '22.366182, 113.544300', 41, 3);
+    await campus.addEdge('Dormitory №16', '22.365168, 113.540755', 14, 3);
+    await campus.addEdge('Dormitory №20 Entrance 1', '22.365189, 113.539670', 14, 3);
+    await campus.addEdge('Dormitory №20 Entrance 2', '22.365164, 113.539925', 13, 3);
+    await campus.addEdge('Dormitory №20 Entrance 3', '22.365165, 113.540014', 11, 3);
+    await campus.addEdge('Dormitory №19 Entrance 1', '22.365189, 113.539670', 18, 3);
+    await campus.addEdge('Dormitory №19 Entrance 2', '22.365164, 113.539925', 17, 3);
+    await campus.addEdge('Dormitory №19 Entrance 2', '22.365445, 113.539863', 13, 3);
+    await campus.addEdge('Dormitory №19 Entrance 3', '22.365175, 113.540113', 19, 3);
 
     // plugs
-    await campus.addEdge('Dormitory №20 Entrance 2', 'Hongyi building', 950);
-    await campus.addEdge('Hongyi building', 'East gate', 1300);
+    await campus.addEdge('Dormitory №20 Entrance 2', 'Hongyi building', 950, 3);
+    await campus.addEdge('Hongyi building', 'East gate', 1300, 3);
 
     console.log(campus.toString());
 
     // Run Dijkstra from Dormitory №20 Entrance 2
-    const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'distance');
+    const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'time');
 
     console.log(result['East gate']); // print the specific node result
+
+
+    // Run Dijkstra for all nodes
+    const resultDijkstraAll = await campus.dijkstraAll('time');
+
+    console.log('\n\ndijkstraAll:')
+    console.log(resultDijkstraAll["Dormitory №20 Entrance 2"]['East gate']);
+
+
+    // Run BellmanFord
+    const resultBellmanFord = await campus.bellmanFord('Dormitory №20 Entrance 2', 'time');
+
+    console.log('\n\nbellmanFord:')
+    console.log(resultBellmanFord['East gate']);
+
+
+    // Run BellmanFord for all nodes
+    const resultBellmanFordAll = await campus.bellmanFordAll('time');
+
+    console.log('\n\nbellmanFordAll:')
+    console.log(resultBellmanFordAll["Dormitory №20 Entrance 2"]['East gate']);
 })()

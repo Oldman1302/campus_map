@@ -231,10 +231,11 @@ class Graph {
      * Base Bellman–Ford core used by both bellmanFord() and johnson()
      *
      * @param {string|Node} start - Start node name or Node instance
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
      * @param {Map<string, Node>|null} customNodes - Optional: custom node map (for Johnson’s extended graph)
-     * @returns {Promise<{ distances: Object<string, number>, predecessors: Object<string, string|null> }>}
+     * @returns {Promise<{ distancesPrimary: Object<string, number>, distancesSecondary: Object<string, number>, predecessors: Object<string, string|null> }>}
      */
-    async #bellmanFordBase(start, customNodes = null) {
+    async #bellmanFordBase(start, weightStrategy, customNodes = null) {
         // Resolve start node
         let startNode;
         const nodeMap = customNodes || this.nodes;
@@ -252,25 +253,37 @@ class Graph {
         const nodeNames = Array.from(nodeMap.keys());
 
         // Initialize distances and predecessors
-        const distances = {};
+        const distancesPrimary = {};
+        const distancesSecondary = {};
         const predecessors = {};
 
         for (const name of nodeNames) {
-            distances[name] = Number.POSITIVE_INFINITY;
+            distancesPrimary[name] = Number.POSITIVE_INFINITY;
+            distancesSecondary[name] = Number.POSITIVE_INFINITY;
             predecessors[name] = null;
         }
-        distances[startNode.name] = 0;
+
+        distancesPrimary[startNode.name] = 0;
+        distancesSecondary[startNode.name] = 0;
+
+        const useDistance = weightStrategy === 'distance';
 
         for (let i = 0; i < nodeList.length - 1; i++) {
             let updated = false;
+
             for (const [uName, uNode] of nodeMap.entries()) {
                 // If current node is a building (not the start), skip expanding neighbors
                 if (uNode.isBuilding && uName !== startNode.name) continue;
 
-                for (const [vNode, distance] of uNode.edges.entries()) {
+                for (const [vNode, edgeData] of uNode.edges.entries()) {
                     const vName = vNode.name;
-                    if (distances[uName] + distance < distances[vName]){
-                        distances[vName] = distances[uName] + distance;
+
+                    const primaryWeight = useDistance ? edgeData.distance : edgeData.time;
+                    const secondaryWeight = useDistance ? edgeData.time : edgeData.distance;
+
+                    if (distancesPrimary[uName] + primaryWeight < distancesPrimary[vName]) {
+                        distancesPrimary[vName] = distancesPrimary[uName] + primaryWeight;
+                        distancesSecondary[vName] = distancesSecondary[uName] + secondaryWeight;
                         predecessors[vName] = uName;
                         updated = true;
                     }
@@ -278,24 +291,30 @@ class Graph {
             }
             if (!updated) break; // optimization: stop early
         }
-        return { distances, predecessors };
+        return { distancesPrimary, distancesSecondary, predecessors };
     }
 
     /**
      * Bellman–Ford algorithm with path reconstruction.
      * Supports negative edge weights.
-     * Returns: { nodeName: { distance: number, path: string } }
+     * Returns: { nodeName: { distance: number, time: number, path: string } }
      *
      * @param {string|Node} start
-     * @returns {Promise<Object<string, {distance:number, path:string}>>}
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * @returns {Promise<Object<string, {distance:number, time: number, path:string}>>}
      */
     // In the future: you can add handler for negative edges
-    async bellmanFord(start) {
-        const { distances, predecessors } = await this.#bellmanFordBase(start);
+    async bellmanFord(start, weightStrategy) {
+        const {
+            distancesPrimary,
+            distancesSecondary, predecessors
+        } = await this.#bellmanFordBase(start, weightStrategy);
+
+        const useDistance = weightStrategy === 'distance';
 
         // Reconstruct paths
         function buildPath(to) {
-            if (distances[to] === Number.POSITIVE_INFINITY) return [];
+            if (distancesPrimary[to] === Number.POSITIVE_INFINITY) return [];
             const path = [];
             let curr = to;
             while (curr !== null) {
@@ -307,10 +326,15 @@ class Graph {
 
         // Format result
         const result = {};
-        for (const [name, distance] of Object.entries(distances)) {
+        for (const name of Object.keys(distancesPrimary)) {
             if (name === (typeof start === 'string' ? start : start.name)) continue;
             result[name] = {
-                distance: distance,
+                distance: useDistance
+                    ? distancesPrimary[name]
+                    : distancesSecondary[name],
+                time: useDistance
+                    ? distancesSecondary[name]
+                    : distancesPrimary[name],
                 path: buildPath(name).join(' -> ')
             };
         }
@@ -320,14 +344,16 @@ class Graph {
 
     /**
      * Compute the shortest paths from every node using Dijkstra.
-     * Returns: { fromNodeName: { toNodeName: {distance, path} } }
+     *
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
      */
-    async dijkstraAll() {
+    async dijkstraAll(weightStrategy) {
         const results = {};
         const nodeNames = Array.from(this.nodes.keys());
 
         for (const name of nodeNames) {
-            results[name] = await this.dijkstra(name);
+            results[name] = await this.dijkstra(name, weightStrategy);
         }
 
         return results;
@@ -335,14 +361,16 @@ class Graph {
 
     /**
      * Compute the shortest paths from every node using Bellman-Ford.
-     * Returns: { fromNodeName: { toNodeName: {distance, path} } }
+     *
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
      */
-    async bellmanFordAll() {
+    async bellmanFordAll(weightStrategy) {
         const results = {};
         const nodeNames = Array.from(this.nodes.keys());
 
         for (const name of nodeNames) {
-            results[name] = await this.bellmanFord(name);
+            results[name] = await this.bellmanFord(name, weightStrategy);
         }
 
         return results;
@@ -430,7 +458,7 @@ class Graph {
     async johnson() {
         // Add temporary node S connected to all nodes with 0-weight edges
         const S = new Node('S', [0, 0], null, false)
-        for (const node of this.nodes.values()) await S.addEdge(node, 0)
+        for (const node of this.nodes.values()) await S.addEdge(node, 0, 0)
 
         // Build extended graph (copy)
         const extended = new Map(this.nodes);
