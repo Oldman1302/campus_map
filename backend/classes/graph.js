@@ -122,16 +122,19 @@ class Graph {
      *
      * @param {string|Node} start
      * @param {string} weightStrategy
+     * @param {Map<string, Node>|null} customNodes - if it's needed to use different graph we use customNodes
      * @returns {Promise<Object<string, {distance:number, path:string}>>}
      */
-    async dijkstra(start, weightStrategy) {
+    async dijkstra(start, weightStrategy, customNodes = null) {
+        const nodeMap = customNodes || this.nodes;
+
         // Resolve start to Node instance
         let startNode;
         if  (typeof start === 'string') {
-            if (!this.nodes.has(start)) throw new Error(`Start node '${start}' not found`);
-            startNode = this.nodes.get(start);
+            if (!nodeMap.has(start)) throw new Error(`Start node '${start}' not found`);
+            startNode = nodeMap.get(start);
         } else if (start instanceof Node) {
-            if (!this.nodes.has(start.name) || this.nodes.get(start.name) !== start) throw new Error(`Start node '${start.name}' not found`);
+            if (!nodeMap.has(start.name) || nodeMap.get(start.name) !== start) throw new Error(`Start node '${start.name}' not found`);
             startNode = start;
         }
         else {
@@ -139,7 +142,7 @@ class Graph {
         }
 
         // Build unvisited set of Node objects
-        const unvisited = new Set(this.nodes.values());
+        const unvisited = new Set(nodeMap.values());
 
         // distances: Map<Node, {primary: number, secondary: number, path: string}>
         // +inf for everyone, 0 for start_node
@@ -213,6 +216,7 @@ class Graph {
             unvisited.delete(current);
         }
 
+
         // Format result
         const result = {};
         for (const [node, info] of distances.entries()) {
@@ -224,6 +228,7 @@ class Graph {
                 path: info.path
             };
         }
+
         return result;
     }
 
@@ -472,9 +477,12 @@ class Graph {
     /**
      * Johnson's Algorithm for all-pairs shortest paths.
      * Efficient for sparse graphs and supports negative edge weights
+     * !!! SHOULD BE REFIXED. IN DIJKSTRA ALGORITHM IT STOPS WORKING CORRECTLY
+     *
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
      * @returns {Promise<Object<string, Object<string, {distance:number, path:string}>>>}
      */
-    async johnson() {
+    async johnson(weightStrategy) {
         // Add temporary node S connected to all nodes with 0-weight edges
         const S = new Node('S', [0, 0], null, false)
         for (const node of this.nodes.values()) await S.addEdge(node, 0, 0)
@@ -484,12 +492,14 @@ class Graph {
         extended.set(S.name, S);
 
         // run Bellman–Ford from S to get potential h
-        const { distances: h } = await this.#bellmanFordBase('S', extended);
+        const { distancesPrimary: h } = await this.#bellmanFordBase('S', weightStrategy, extended);
+
 
         // Check for negative-weight cycles
         for (const [uName, uNode] of extended.entries()) {
-            for (const [vNode, weight] of uNode.edges.entries()) {
-                if (h[uName] + weight < h[vNode.name]) {
+            if (h[uName] === undefined) continue;
+            for (const [vNode, edgeData] of uNode.edges.entries()) {
+                if (h[uName] + edgeData[weightStrategy] < h[vNode.name]) {
                     throw new Error('Graph contains a negative-weight cycle');
                 }
             }
@@ -497,28 +507,47 @@ class Graph {
 
         // reweight edges to eliminate negatives
         const reweighted = new Map();
+
         for (const [name, node] of this.nodes.entries()) {
             const newNode = new Node(name, node.coordinates, node.subgraph, node.isBuilding);
-            for (const [neighbor, weight] of node.edges.entries()) {
-                const newWeight = weight + h[name] - h[neighbor.name];
-                await newNode.addEdge(neighbor, newWeight);
+
+            for (const [neighbor, edgeData] of node.edges.entries()) {
+                const newWeight = edgeData[weightStrategy] + h[name] - h[neighbor.name];
+
+                const newDistance = weightStrategy === 'distance'
+                    ? newWeight
+                    : edgeData.distance;
+
+                const newTime = weightStrategy === 'distance'
+                    ? edgeData.time
+                    : newWeight;
+
+                await newNode.addEdge(neighbor, newDistance, newTime);
             }
             reweighted.set(name, newNode);
         }
 
         // run Dijkstra from each node
         const result = {};
-        for (const [uName, uNode] of reweighted.entries()) {
-            // Skip buildings as starting points
-            if (uNode.isBuilding) continue;
-
-            const dijkstraResult = await this.dijkstra(uName);
+        for (const [uName] of reweighted.entries()) {
+            const dijkstraResult = await this.dijkstra(uName, weightStrategy, reweighted);
 
             result[uName] = {};
-            for (const [vName, { distance, path }] of Object.entries(dijkstraResult)) {
-                const realDist = distance + h[vName] - h[uName];
+            for (const [vName, { distance, time, path }] of Object.entries(dijkstraResult)) {
+                // Skip buildings in the path
+                if (this.nodes.get(vName).isBuilding) continue;
+                const correctedPrimary = (weightStrategy === 'distance'
+                        ? distance
+                        : time)
+                    + h[vName] - h[uName];
+
                 result[uName][vName] = {
-                    distance: realDist,
+                    distance: weightStrategy === 'distance'
+                        ? correctedPrimary
+                        : distance,
+                    time: weightStrategy === 'distance'
+                        ? time
+                        : correctedPrimary,
                     path
                 };
             }

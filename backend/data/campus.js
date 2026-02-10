@@ -102,6 +102,7 @@ const dgram = require("node:dgram");
     // Run Dijkstra from Dormitory №20 Entrance 2
     const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'time');
 
+    console.log('\n\ndijkstra:')
     console.log(result['East gate']); // print the specific node result
 
 
@@ -131,4 +132,11 @@ const dgram = require("node:dgram");
 
     console.log('\n\nfloydWarshall:')
     console.log(resultBellmanFordAll["Dormitory №20 Entrance 2"]['East gate']);
+
+
+    // Run johnson for all nodes
+    const johnson = await campus.johnson('distance');
+
+    console.log('\n\njohnson:')
+    console.log(johnson["Dormitory №20 Entrance 2"]["East gate"]);
 })()
