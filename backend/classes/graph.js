@@ -7,7 +7,7 @@ class Graph {
     constructor(name) {
         this.name = name;
         this.nodes = new Map();
-        this.weightStrategy = edge => edge.distance;
+        // this.weightStrategy = edge => edge.distance;
     }
 
     /**
@@ -91,14 +91,14 @@ class Graph {
         return this.nodes.delete(node.name);
     }
 
-    /**
-     * Set weight calculation strategy
-     *
-     * @param {(edge: {distance:number, time:number}) => number} strategy
-     */
-    setWeightStrategy(strategy) {
-        this.weightStrategy = strategy;
-    }
+    // /**
+    //  * Set weight calculation strategy
+    //  *
+    //  * @param {(edge: {distance:number, time:number}) => number} strategy
+    //  */
+    // setWeightStrategy(strategy) {
+    //     this.weightStrategy = strategy;
+    // }
 
     toString() {
         const lines = [`Graph(${this.name}):`];
