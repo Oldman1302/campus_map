@@ -44,7 +44,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result3["City1"]["City500"]);
+    console.log(result3[startNode]["City500"]);
     console.log("____________________________________________________");
 
     // --- Bellman-Ford all-pairs ---
@@ -56,7 +56,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result4["City1"]["City500"]);
+    console.log(result4[startNode]["City500"]);
     console.log("____________________________________________________");
 
     // --- Floyd–Warshall ---
@@ -68,19 +68,20 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result5["City1"]["City500"]);
+    console.log(result5[startNode]["City500"]);
     console.log("____________________________________________________");
 
-    // // --- Johnson’s Algorithm ---
-    // console.log(`\nRunning Johnson’s Algorithm...`);
-    // console.log("____________________________________________________");
-    //
-    // t0 = performance.now();
-    // await graph.johnson();
-    // t1 = performance.now();
-    // console.log(`Computed all shortest paths.`);
-    // console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    // console.log("____________________________________________________");
+    // --- Johnson’s Algorithm ---
+    console.log(`\nRunning Johnson’s Algorithm...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    const result6 = await graph.johnson("distance");
+    t1 = performance.now();
+    console.log(`Computed all shortest paths.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result6[startNode]["City500"]);
+    console.log("____________________________________________________");
 }
 
 module.exports = { test };

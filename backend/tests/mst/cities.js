@@ -34,7 +34,7 @@ async function loadCitiesGraph(csvPath) {
         }
 
         // add directed edge
-        await graph.addEdge(from, to, distance, false);
+        await graph.addEdge(from, to, distance, 1, false);
     }
 
     return graph;

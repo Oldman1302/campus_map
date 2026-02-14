@@ -477,7 +477,6 @@ class Graph {
     /**
      * Johnson's Algorithm for all-pairs shortest paths.
      * Efficient for sparse graphs and supports negative edge weights
-     * !!! SHOULD BE REFIXED. IN DIJKSTRA ALGORITHM IT STOPS WORKING CORRECTLY
      *
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
      * @returns {Promise<Object<string, Object<string, {distance:number, path:string}>>>}
@@ -509,7 +508,14 @@ class Graph {
         const reweighted = new Map();
 
         for (const [name, node] of this.nodes.entries()) {
-            const newNode = new Node(name, node.coordinates, node.subgraph, node.isBuilding);
+            reweighted.set(
+                name,
+                new Node(name, node.coordinates, node.subgraph, node.isBuilding)
+            );
+        }
+
+        for (const [name, node] of this.nodes.entries()) {
+            const newNode = reweighted.get(name);
 
             for (const [neighbor, edgeData] of node.edges.entries()) {
                 const newWeight = edgeData[weightStrategy] + h[name] - h[neighbor.name];
@@ -522,9 +528,10 @@ class Graph {
                     ? edgeData.time
                     : newWeight;
 
-                await newNode.addEdge(neighbor, newDistance, newTime);
+                const newNeighbor = reweighted.get(neighbor.name);
+
+                await newNode.addEdge(newNeighbor, newDistance, newTime);
             }
-            reweighted.set(name, newNode);
         }
 
         // run Dijkstra from each node
@@ -534,8 +541,6 @@ class Graph {
 
             result[uName] = {};
             for (const [vName, { distance, time, path }] of Object.entries(dijkstraResult)) {
-                // Skip buildings in the path
-                if (this.nodes.get(vName).isBuilding) continue;
                 const correctedPrimary = (weightStrategy === 'distance'
                         ? distance
                         : time)
