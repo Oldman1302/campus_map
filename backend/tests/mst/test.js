@@ -7,5 +7,5 @@ const { test} = require('../test');
     console.log('Loading graph from', csvPath, '...');
 
     const graph = await loadCitiesGraph(csvPath);
-    await test(graph, 'City1');
+    await test(graph, 'City1', 'City500');
 })();

@@ -6,9 +6,10 @@ const {performance} = require('perf_hooks');
  *
  * @param {Graph} graph
  * @param {string|Node} startNode
+ * @param {string|Node} endNode
  * @returns {Promise<void>}
  */
-async function test(graph, startNode) {
+async function test(graph, startNode, endNode) {
     console.log(`\nLoaded graph: ${graph.name} (${graph.nodes.size} nodes)`);
 
     // --- Dijkstra from start ---
@@ -20,7 +21,7 @@ async function test(graph, startNode) {
     let t1 = performance.now();
     console.log(`Computed shortest paths from ${startNode}.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result["City500"]);
+    console.log(result[endNode]);
     console.log("____________________________________________________");
 
     // --- Bellman-Ford from start ---
@@ -32,7 +33,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed shortest paths from ${startNode}.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result2["City500"]);
+    console.log(result2[endNode]);
     console.log("____________________________________________________");
 
     // --- Dijkstra all-pairs ---
@@ -44,7 +45,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result3[startNode]["City500"]);
+    console.log(result3[startNode][endNode]);
     console.log("____________________________________________________");
 
     // --- Bellman-Ford all-pairs ---
@@ -56,7 +57,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all-pairs shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result4[startNode]["City500"]);
+    console.log(result4[startNode][endNode]);
     console.log("____________________________________________________");
 
     // --- Floyd–Warshall ---
@@ -68,7 +69,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result5[startNode]["City500"]);
+    console.log(result5[startNode][endNode]);
     console.log("____________________________________________________");
 
     // --- Johnson’s Algorithm ---
@@ -80,7 +81,7 @@ async function test(graph, startNode) {
     t1 = performance.now();
     console.log(`Computed all shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
-    console.log(result6[startNode]["City500"]);
+    console.log(result6[startNode][endNode]);
     console.log("____________________________________________________");
 }
 
