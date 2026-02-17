@@ -60,9 +60,9 @@ functions:
 
    2.2.3. deleteEdge(from: str|node, to: str|Node) - delete an edge from the graph and returns true if edge existed and was removed
 
-&nbsp;  2.2.4. deleteNode(target: str|Node) - Delete a node from the graph by its name (and all edges connected to it) and returns true if node existed and was removed
+   2.2.4. deleteNode(target: str|Node) - Delete a node from the graph by its name (and all edges connected to it) and returns true if node existed and was removed
 
-&nbsp;  2.2.5. dijkstra(start: string|Node, weightStrategy: str, customNodes = null:  Map<string, Node>) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm. We can calculate the best path by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.5. dijkstra(start: string|Node, weightStrategy: str, customNodes = null:  Map<string, Node>) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm. We can calculate the best path by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
    2.2.6. bellmanFordBase(start: str, weightStrategy: str, customNodes = null: Map<string, Node>) - Internal helper for Bellman–Ford algorithm base logic. Used by both Bellman–Ford and Johnson’s algorithms.
 
@@ -74,7 +74,11 @@ functions:
 
    2.2.10. floydWarshall(weightStrategy: str) - computes the shortest paths from each node to others by Floyd–Warshall algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.11. johnson(weightStrategy: str) - computes the shortest paths from each node to others by Johnson algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time").
+   2.2.11. johnson(weightStrategy: str) - computes the shortest paths from each node to others by Johnson algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+
+&nbsp;  2.2.12. aStar(start: str|Node, goal: str|Node, weightStrategy: str) - finds the shortest paths from node Start to node Goal by A\* algorithm (the most efficient algorithm to find the shortest path from one point to another). We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+
+&nbsp;  2.2.13. aStarAll(weightStrategy: str) - computes the shortest paths from each node to others by A\* algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time").
 
 
 
