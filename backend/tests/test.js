@@ -77,11 +77,35 @@ async function test(graph, startNode, endNode) {
     console.log("____________________________________________________");
 
     t0 = performance.now();
-    const result6 = await graph.johnson("distance");
+    const result6 = await graph.johnson("time");
     t1 = performance.now();
     console.log(`Computed all shortest paths.`);
     console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
     console.log(result6[startNode][endNode]);
+    console.log("____________________________________________________");
+
+    // --- A* algorithm ---
+    console.log(`\nRunning A* Algorithm...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    const result7 = graph.aStar(startNode, endNode, "time");
+    t1 = performance.now();
+    console.log(`Computed shortest paths from ${startNode}.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result7);
+    console.log("____________________________________________________");
+
+    // --- A* all-pairs ---
+    console.log(`\nRunning A* from all nodes...`);
+    console.log("____________________________________________________");
+
+    t0 = performance.now();
+    const result8 = graph.aStarAll("time");
+    t1 = performance.now();
+    console.log(`Computed shortest paths from ${startNode}.`);
+    console.log(`Time complexity: ${(t1 - t0).toFixed(2)} ms`);
+    console.log(result8[startNode][endNode]);
     console.log("____________________________________________________");
 }
 

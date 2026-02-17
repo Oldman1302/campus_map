@@ -382,9 +382,9 @@ class Graph {
     }
 
     /**
-     *  * Floyd–Warshall algorithm for all-pairs shortest paths.
+     * Floyd–Warshall algorithm for all-pairs shortest paths.
      *
-     *  @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
      * Returns object { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
      */
     async floydWarshall(weightStrategy) {
@@ -557,6 +557,173 @@ class Graph {
                 };
             }
         }
+        return result;
+    }
+
+    /**
+     * A* search algorithm (single-source -> single-target).
+     *
+     * @param {string|Node} start
+     * @param {string|Node} goal
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * @returns {{distance: number, time: number, path: string}}
+     */
+    aStar(start, goal,weightStrategy) {
+        // Resolve start to Node instance
+        let startNode;
+        if  (typeof start === 'string') {
+            if (!this.nodes.has(start)) throw new Error(`Start node '${start}' not found`);
+            startNode = this.nodes.get(start);
+        } else if (start instanceof Node) {
+            if (!this.nodes.has(start.name) || this.nodes.get(start.name) !== start) throw new Error(`Start node '${start.name}' not found`);
+            startNode = start;
+        }
+        else {
+            throw new Error('start must be node name (string) or Node object');
+        }
+
+        // Resolve goal node to Node instance
+        let goalNode
+        if  (typeof goal === 'string') {
+            if (!this.nodes.has(goal)) throw new Error(`Goal node '${goal}' not found`);
+            goalNode = this.nodes.get(goal);
+        } else if (goal instanceof Node) {
+            if (!this.nodes.has(goal.name) || this.nodes.get(goal.name) !== goal) throw new Error(`Goal node '${goal.name}' not found`);
+            goalNode = goal;
+        }
+        else {
+            throw new Error('goal must be node name (string) or Node object');
+        }
+
+        const secondWeightStrategy = weightStrategy === "distance" ? "time" : "distance";
+
+        // Heuristic function (Euclidean distance)
+        const heuristic = (node) => {
+            if (!node.coordinates || !goalNode.coordinates) return 0;
+
+            const [x1, y1] = node.coordinates;
+            const [x2, y2] = goalNode.coordinates;
+
+            return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+        };
+
+        // Data structures
+        const openSet = new Set([startNode]);
+
+        // gScore = real cost from start to node
+        const gScore = new Map();
+        // fScore = g + heuristic
+        const fScore = new Map();
+        // secondary metric tracking
+        const secondaryScore = new Map();
+        // path tracking
+        const pathMap = new Map();
+
+        // Initialization
+        for (const node of this.nodes.values()) {
+            gScore.set(node, Infinity);
+            fScore.set(node, Infinity);
+            secondaryScore.set(node, Infinity);
+            pathMap.set(node, "");
+        }
+
+        gScore.set(startNode, 0);
+        secondaryScore.set(startNode, 0);
+        fScore.set(startNode, heuristic(startNode));
+        pathMap.set(startNode, startNode.name);
+
+        while (openSet.size > 0) {
+            // Find node in openSet with lowest fScore
+            let current = null;
+            let minF = Infinity;
+
+            for (const node of openSet) {
+                const score = fScore.get(node);
+                if (score < minF) {
+                    minF = score;
+                    current = node;
+                }
+            }
+
+            // If goal reached, reconstruct result
+            if (current === goalNode) {
+                return {
+                    distance: weightStrategy === 'distance'
+                    ? gScore.get(current)
+                    : secondaryScore.get(current),
+                    time: weightStrategy === 'time'
+                    ? gScore.get(current)
+                    : secondaryScore.get(current),
+                    path: pathMap.get(current)
+                };
+            }
+
+            openSet.delete(current);
+
+            if (current.isBuilding && current !== startNode && current !== goalNode) continue;
+
+            // Explore neighbors
+            for (const [neighbor, edgeData] of current.edges.entries()) {
+                const primaryWeight = edgeData[weightStrategy];
+                const secondaryWeight = edgeData[secondWeightStrategy];
+
+                const testG = gScore.get(current) + primaryWeight;
+
+                if (testG < gScore.get(neighbor)) {
+                    gScore.set(neighbor, testG);
+                    secondaryScore.set(
+                        neighbor,
+                        secondaryScore.get(current) + secondaryWeight
+                    );
+
+                    fScore.set(
+                        neighbor,
+                        testG + heuristic(neighbor)
+                    );
+
+                    pathMap.set(
+                        neighbor,
+                        pathMap.get(current) + " -> " + neighbor.name
+                    );
+
+                    openSet.add(neighbor);
+                }
+            }
+        }
+
+        // If goal not reachable
+        return {
+            distance: Infinity,
+            time: Infinity,
+            path: ""
+        };
+    }
+
+    /**
+     * Compute the shortest paths from every node using A*.
+     *
+     * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
+     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
+     */
+    aStarAll(weightStrategy) {
+        const result = {};
+
+        const nodesArray = Array.from(this.nodes.values());
+
+        for (const startNode of nodesArray) {
+            result[startNode.name] = {};
+
+            for (const goalNode of nodesArray) {
+                if (startNode === goalNode) {
+                    result[startNode.name][goalNode.name] = {distance: 0, time: 0, path: startNode.name};
+                    continue;
+                }
+
+                // Run A* for this pair
+                result[startNode.name][goalNode.name] = this.aStar(startNode, goalNode, weightStrategy);
+            }
+        }
+
         return result;
     }
 }

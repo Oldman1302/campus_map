@@ -137,15 +137,29 @@ const Graph = require("../classes/graph");
 
 
     // Run floydWarshall for all nodes
-    const floydWarshall = await campus.floydWarshall('distance');
+    const resultFloydWarshall = await campus.floydWarshall('distance');
 
     console.log('\n\nfloydWarshall:')
-    console.log(floydWarshall["Dormitory №20 Entrance 2"]['East gate']);
+    console.log(resultFloydWarshall["Dormitory №20 Entrance 2"]['East gate']);
 
 
     // Run johnson for all nodes
-    const johnson = await campus.johnson('time');
+    const resultJohnson = await campus.johnson('time');
 
     console.log('\n\njohnson:')
-    console.log(johnson["Dormitory №20 Entrance 2"]["East gate"]);
+    console.log(resultJohnson["Dormitory №20 Entrance 2"]["East gate"]);
+
+
+    // Run A* from Dormitory №20 Entrance 2
+    const resultAStar = await campus.aStar('Dormitory №20 Entrance 2', 'East gate', 'time');
+
+    console.log('\n\nA*:')
+    console.log(resultAStar);
+
+
+    // Run A* for all nodes
+    const resultAStarAll = await campus.aStarAll('time');
+
+    console.log('\n\nA* for all nodes:')
+    console.log(resultAStarAll["Dormitory №20 Entrance 2"]["East gate"]);
 })()
