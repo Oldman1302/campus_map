@@ -1,6 +1,10 @@
 const Graph = require("../classes/graph");
-// const dgram = require("node:dgram");
-(async () => {
+
+/**
+ * Builds and returns campus graph.
+ * @returns {Promise<Graph>}
+ */
+async function loadCampusGraph() {
     const campus = new Graph("campus");
 
     await campus.addNode('Dormitory №20 Entrance 1', [22.365083, 113.539671], null, true);
@@ -105,61 +109,64 @@ const Graph = require("../classes/graph");
     await campus.addEdge('Dormitory №20 Entrance 2', 'Hongyi building', 950, 3);
     await campus.addEdge('Hongyi building', 'East gate', 1300, 3);
 
-    console.log(campus.toString());
+    return campus;
+    // console.log(campus.toString());
+    //
+    //
+    // // Run Dijkstra from Dormitory №20 Entrance 2
+    // const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'distance');
+    //
+    // console.log('\n\ndijkstra:')
+        // console.log(result['East gate']); // print the specific node result
+    //
+    //
+    // // Run Dijkstra for all nodes
+    // const resultDijkstraAll = await campus.dijkstraAll('distance');
+    //
+    // console.log('\n\ndijkstraAll:')
+    // console.log(resultDijkstraAll["Dormitory №20 Entrance 2"]['East gate']);
+    //
+    //
+    // // Run BellmanFord
+    // const resultBellmanFord = await campus.bellmanFord('Dormitory №20 Entrance 2', 'distance');
+    //
+    // console.log('\n\nbellmanFord:')
+    // console.log(resultBellmanFord['East gate']);
+    //
+    //
+    // // Run BellmanFord for all nodes
+    // const resultBellmanFordAll = await campus.bellmanFordAll('time');
+    //
+    // console.log('\n\nbellmanFordAll:')
+    // console.log(resultBellmanFordAll["Dormitory №20 Entrance 2"]['East gate']);
+    //
+    //
+    // // Run floydWarshall for all nodes
+    // const resultFloydWarshall = await campus.floydWarshall('distance');
+    //
+    // console.log('\n\nfloydWarshall:')
+    // console.log(resultFloydWarshall["Dormitory №20 Entrance 2"]['East gate']);
+    //
+    //
+    // // Run johnson for all nodes
+    // const resultJohnson = await campus.johnson('time');
+    //
+    // console.log('\n\njohnson:')
+    // console.log(resultJohnson["Dormitory №20 Entrance 2"]["East gate"]);
+    //
+    //
+    // // Run A* from Dormitory №20 Entrance 2
+    // const resultAStar = await campus.aStar('Dormitory №20 Entrance 2', 'East gate', 'time');
+    //
+    // console.log('\n\nA*:')
+    // console.log(resultAStar);
+    //
+    //
+    // // Run A* for all nodes
+    // const resultAStarAll = await campus.aStarAll('time');
+    //
+    // console.log('\n\nA* for all nodes:')
+    // console.log(resultAStarAll["Dormitory №20 Entrance 2"]["East gate"]);
+}
 
-
-    // Run Dijkstra from Dormitory №20 Entrance 2
-    const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'distance');
-
-    console.log('\n\ndijkstra:')
-    console.log(result['East gate']); // print the specific node result
-
-
-    // Run Dijkstra for all nodes
-    const resultDijkstraAll = await campus.dijkstraAll('distance');
-
-    console.log('\n\ndijkstraAll:')
-    console.log(resultDijkstraAll["Dormitory №20 Entrance 2"]['East gate']);
-
-
-    // Run BellmanFord
-    const resultBellmanFord = await campus.bellmanFord('Dormitory №20 Entrance 2', 'distance');
-
-    console.log('\n\nbellmanFord:')
-    console.log(resultBellmanFord['East gate']);
-
-
-    // Run BellmanFord for all nodes
-    const resultBellmanFordAll = await campus.bellmanFordAll('time');
-
-    console.log('\n\nbellmanFordAll:')
-    console.log(resultBellmanFordAll["Dormitory №20 Entrance 2"]['East gate']);
-
-
-    // Run floydWarshall for all nodes
-    const resultFloydWarshall = await campus.floydWarshall('distance');
-
-    console.log('\n\nfloydWarshall:')
-    console.log(resultFloydWarshall["Dormitory №20 Entrance 2"]['East gate']);
-
-
-    // Run johnson for all nodes
-    const resultJohnson = await campus.johnson('time');
-
-    console.log('\n\njohnson:')
-    console.log(resultJohnson["Dormitory №20 Entrance 2"]["East gate"]);
-
-
-    // Run A* from Dormitory №20 Entrance 2
-    const resultAStar = await campus.aStar('Dormitory №20 Entrance 2', 'East gate', 'time');
-
-    console.log('\n\nA*:')
-    console.log(resultAStar);
-
-
-    // Run A* for all nodes
-    const resultAStarAll = await campus.aStarAll('time');
-
-    console.log('\n\nA* for all nodes:')
-    console.log(resultAStarAll["Dormitory №20 Entrance 2"]["East gate"]);
-})()
+module.exports = { loadCampusGraph };

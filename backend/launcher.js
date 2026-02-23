@@ -1,11 +1,18 @@
-process.env.DOTENV_CONFIG_QUIET = true; // disables hints from dotenv
-const dotenv = require("dotenv");
+/**
+ * Application launcher.
+ * Loads environment variables and starts the server.
+ */
 
-dotenv.config()
-const PORT = process.env.PORT || 8080;
+require("dotenv").config();
+const { startServer } = require("./server/server.js");
+
+// Read port from .env
+const PORT = process.env.PORT || 5001;
+
+startServer(PORT);
 
 // ______________________________________________________
-require("./data/campus")
+// require("./data/campus")
 // ______________________________________________________
 
 // console.log(`I'm alive on ${PORT}`);
