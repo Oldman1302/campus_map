@@ -748,7 +748,7 @@ class Graph {
     * Finds the closest node in graph to given coordinates.
     *
     * @param {[number, number]} coordinates
-    * @returns {{name: string, distance: number}|null}
+    * @returns {{name: string | null, distance: number}}
     */
     findClosestNode(coordinates) {
         let closestNode = null;
@@ -763,7 +763,7 @@ class Graph {
             }
         }
 
-        return closestNode;
+        return {name: closestNode, distance: minDistance};
     }
 }
 
