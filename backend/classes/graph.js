@@ -726,6 +726,45 @@ class Graph {
 
         return result;
     }
+
+    /**
+     * Ultra-fast planar distance in meters.
+     *
+     * @param {[number, number]} coordinate1
+     * @param {[number, number]} coordinate2
+     * @returns {number}
+     */
+    _euclidDistance(coordinate1, coordinate2) {
+        const METERS_PER_DEGREE_LAT = 111320;
+        const METERS_PER_DEGREE_LON = 102971; // fixed for 22.365° latitude
+
+        const dLat = (coordinate2[0] - coordinate1[0]) * METERS_PER_DEGREE_LAT;
+        const dLon = (coordinate2[1] - coordinate1[1]) * METERS_PER_DEGREE_LON;
+
+        return Math.sqrt(dLat * dLat + dLon * dLon);
+    }
+
+    /**
+    * Finds the closest node in graph to given coordinates.
+    *
+    * @param {[number, number]} coordinates
+    * @returns {{name: string, distance: number}|null}
+    */
+    findClosestNode(coordinates) {
+        let closestNode = null;
+        let minDistance = Infinity;
+
+        for (const [nodeName, node] of this.nodes.entries()) {
+            const distance = this._euclidDistance(coordinates, node.coordinates);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestNode = nodeName;
+            }
+        }
+
+        return closestNode;
+    }
 }
 
 module.exports = Graph;
