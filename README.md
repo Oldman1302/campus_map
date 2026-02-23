@@ -76,9 +76,13 @@ functions:
 
    2.2.11. johnson(weightStrategy: str) - computes the shortest paths from each node to others by Johnson algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-&nbsp;  2.2.12. aStar(start: str|Node, goal: str|Node, weightStrategy: str) - finds the shortest paths from node Start to node Goal by A\* algorithm (the most efficient algorithm to find the shortest path from one point to another). We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.12. aStar(start: str|Node, goal: str|Node, weightStrategy: str) - finds the shortest paths from node Start to node Goal by A\* algorithm (the most efficient algorithm to find the shortest path from one point to another). We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-&nbsp;  2.2.13. aStarAll(weightStrategy: str) - computes the shortest paths from each node to others by A\* algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time").
+   2.2.13. aStarAll(weightStrategy: str) - computes the shortest paths from each node to others by A\* algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+
+&nbsp;  2.2.14. findClosestNode(coordinates: array) - finds the closest node from our graph to the node which we use as a parameter. This function is needed if user's trying to find the path from (or to) the location which is not included to the nodes of our graph;
+
+&nbsp;  2.2.15. \_euclideanDistance(coordinate1: number, coordinate2: number) - auxiliary inner function for findClosestNode. Here we calculate the distance between points coordinate1 and coordinate2 by Euclidean distance.
 
 
 
