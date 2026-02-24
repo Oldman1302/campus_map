@@ -18,17 +18,19 @@ If installed, you should see something like `10.7.0`;
 3. If either node or npm is not installed then download LTS (Long Term Support) version Node.js from official website https://nodejs.org/ and restart terminal after all and repeat steps 1 and 2;
 4. Check if Git is installed:
 `git --version`;
-If installed, you should see something like `git version 2.45.1.windows.1`
+If git is not installed, you should see something like `git version 2.45.1.windows.1`
 5. If Git is not installed: https://git-scm.com/downloads and restart terminal after all and repeat step 4;
 6. Clone the repository:
 `git clone https://github.com/Oldman1302/campus_map.git`;
-7. Open terminal in our project;
-8. Open backend folder:
+7. Open terminal in the project;
+8. (Optional) Fetch all remote branches:
+`git fetch --all --prune`;
+9. Open backend folder:
 `cd backend`;
-9. Install Project Dependencies:
+10. Install Project Dependencies:
 `npm install`;
-10. In the file backend\.env you can choose the port on which you want to use application or leave it by default (5001);
-11. Run the server:
+11. In the file backend\.env you can choose the port on which you want to use application or leave it by default (5001);
+12. Run the server:
 `npm run start`
 If everything works - you’ll get following result in console:
 >Loading campus graph...
@@ -38,11 +40,11 @@ If everything works - you’ll get following result in console:
 >
 >Server running on port 5001
 >I'm alive on port 5001
-12. Test locally. Open browser and test:
+13. Test locally. Open browser and test:
 http://localhost:5001/route?from=East%20gate&to=Dormitory%20%E2%84%9620%20Entrance%201&strategy=distance
 IMPORTANT: port must be different if you changed it in backend\.env. If everything works - you’ll get JSON response:
 `{"strategy":"distance","distance":735,"time":625,"path":"East gate -> 22.367268, 113.544894 -> 22.366176, 113.544281 -> 22.366066, 113.544259 -> 22.365812, 113.544095 -> 22.365489, 113.543882 -> 22.365159, 113.543665 -> 22.365163, 113.543197 -> 22.365135, 113.542967 -> 22.365145, 113.542593 -> 22.365147, 113.542328 -> 22.365123, 113.542061 -> 22.365130, 113.541675 -> 22.365130, 113.541179 -> 22.365168, 113.540755 -> 22.365144, 113.540375 -> 22.365162, 113.540256 -> 22.365175, 113.540113 -> 22.365165, 113.540014 -> 22.365164, 113.539925 -> 22.365189, 113.539670 -> Dormitory №20 Entrance 1"}`;
-13. (Optional) if you want external access you can use ngrok:
+14. (Optional) if you want external access you can use ngrok:
 `npx ngrok http 5001`
 IMPORTANT: port must be different if you changed it in backend\.env.
 
