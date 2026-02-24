@@ -18,7 +18,7 @@ If installed, you should see something like `10.7.0`;
 3. If either node or npm is not installed then download LTS (Long Term Support) version Node.js from official website https://nodejs.org/ and restart terminal after all and repeat steps 1 and 2;
 4. Check if Git is installed:
 `git --version`;
-If git is not installed, you should see something like `git version 2.45.1.windows.1`
+If Git is installed, you should see something like `git version 2.45.1.windows.1`
 5. If Git is not installed: https://git-scm.com/downloads and restart terminal after all and repeat step 4;
 6. Clone the repository:
 `git clone https://github.com/Oldman1302/campus_map.git`;
