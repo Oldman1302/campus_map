@@ -107,31 +107,33 @@ functions:
 
    2.2.2. addEdge(name1: str, name2: str, distance: float, time: number, bidirectional: bool = True) - adds the edge between nodes. In the case of further deployment, the attribute "bidirectional" can be very useful, since the distance (or time) from point A to point B will not always be the same as the distance from point B to point A (for example, traffic jams can affect the choice of route);
 
-   2.2.3. deleteEdge(from: str|node, to: str|Node) - delete an edge from the graph and returns true if edge existed and was removed
+   2.2.3. getAllNodes() - returns all graph nodes. It's useful for sending nodes to client side;
 
-   2.2.4. deleteNode(target: str|Node) - Delete a node from the graph by its name (and all edges connected to it) and returns true if node existed and was removed
+   2.2.4. deleteEdge(from: str|node, to: str|Node) - delete an edge from the graph and returns true if edge existed and was removed;
 
-   2.2.5. dijkstra(start: string|Node, weightStrategy: str, customNodes = null:  Map<string, Node>) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm. We can calculate the best path by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.5. deleteNode(target: str|Node) - Delete a node from the graph by its name (and all edges connected to it) and returns true if node existed and was removed;
 
-   2.2.6. bellmanFordBase(start: str, weightStrategy: str, customNodes = null: Map<string, Node>) - Internal helper for Bellman–Ford algorithm base logic. Used by both Bellman–Ford and Johnson’s algorithms.
+   2.2.6. dijkstra(start: string|Node, weightStrategy: str, customNodes = null:  Map<string, Node>) - finds the shortest paths from node Start to other nodes by Dijkstra's algorithm. We can calculate the best path by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.7. bellmanFord(start: str|Node, weightStrategy: str) - finds the shortest paths from node Start to other nodes by Bellman–Ford's algorithm. We can calculate the best path by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");;
+   2.2.7. bellmanFordBase(start: str, weightStrategy: str, customNodes = null: Map<string, Node>) - Internal helper for Bellman–Ford algorithm base logic. Used by both Bellman–Ford and Johnson’s algorithms.
 
-   2.2.8. dijkstraAll(weightStrategy: str) - computes the shortest paths from each node to others by Dijkstra's algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.8. bellmanFord(start: str|Node, weightStrategy: str) - finds the shortest paths from node Start to other nodes by Bellman–Ford's algorithm. We can calculate the best path by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");;
 
-   2.2.9. bellmanFordAll(weightStrategy: str) - computes the shortest paths from each node to others by Bellman–Ford's algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.9. dijkstraAll(weightStrategy: str) - computes the shortest paths from each node to others by Dijkstra's algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.10. floydWarshall(weightStrategy: str) - computes the shortest paths from each node to others by Floyd–Warshall algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.10. bellmanFordAll(weightStrategy: str) - computes the shortest paths from each node to others by Bellman–Ford's algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.11. johnson(weightStrategy: str) - computes the shortest paths from each node to others by Johnson algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.11. floydWarshall(weightStrategy: str) - computes the shortest paths from each node to others by Floyd–Warshall algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.12. aStar(start: str|Node, goal: str|Node, weightStrategy: str) - finds the shortest paths from node Start to node Goal by A\* algorithm (the most efficient algorithm to find the shortest path from one point to another). We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.12. johnson(weightStrategy: str) - computes the shortest paths from each node to others by Johnson algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.13. aStarAll(weightStrategy: str) - computes the shortest paths from each node to others by A\* algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
+   2.2.13. aStar(start: str|Node, goal: str|Node, weightStrategy: str) - finds the shortest paths from node Start to node Goal by A\* algorithm (the most efficient algorithm to find the shortest path from one point to another). We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.14. findClosestNode(coordinates: array) - finds the closest node from our graph to the node which we use as a parameter. This function is needed if user's trying to find the path from (or to) the location which is not included to the nodes of our graph;
+   2.2.14. aStarAll(weightStrategy: str) - computes the shortest paths from each node to others by A\* algorithm. We can calculate the best paths by the shortest distance (weightStrategy = "distance") or by the fastest time (weightStrategy = "time");
 
-   2.2.15. \_euclideanDistance(coordinate1: number, coordinate2: number) - auxiliary inner function for findClosestNode. Here we calculate the distance between points coordinate1 and coordinate2 by Euclidean distance.
+   2.2.15. findClosestNode(coordinates: array) - finds the closest node from our graph to the node which we use as a parameter. This function is needed if user's trying to find the path from (or to) the location which is not included to the nodes of our graph;
+
+   2.2.16. \_euclideanDistance(coordinate1: number, coordinate2: number) - auxiliary inner function for findClosestNode. Here we calculate the distance between points coordinate1 and coordinate2 by Euclidean distance.
 
 
 
