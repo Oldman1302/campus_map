@@ -55,7 +55,7 @@ Requests:
 
 This section explains how to make requests to server.
 
-1. GET / - GET-request to obtain user's IP and approximate location;
+1. GET / - GET-request to obtain all nodes (name, coordinates, boolean value isBuilding) from the graph;
 2. GET /route?from=${fromPosition}&to=${toPosition}&strategy={strategy} - GET-request to obtain path from starting position (parameter fromPosition) to terminal position (parameter toPosition). The path can be the shortest (if parameter strategy = "distance") or the fastest (if parameter strategy = "time")
 e.g. `/route?from=East%20gate&to=Dormitory%20%E2%84%9620%20Entrance%201&strategy=distance`.
 
