@@ -45,6 +45,26 @@ class Graph {
     }
 
     /**
+     * Returns all graph nodes
+     *
+     * @returns {Array<{name: string, coordinates: [number, number], isBuilding: boolean}>}
+     */
+    getAllNodes() {
+        const nodesArray = [];
+
+        for (const node of this.nodes.values()) {
+
+            nodesArray.push({
+                name: node.name,
+                coordinates: node.coordinates,
+                isBuilding: node.isBuilding || false
+            });
+        }
+
+        return nodesArray;
+    }
+
+    /**
      * Delete an edge from the graph
      *
      *  * @param {string|Node} from

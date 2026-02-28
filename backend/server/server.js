@@ -12,6 +12,9 @@ async function startServer(port) {
 
     const graph = await loadCampusGraph();
 
+    console.log("Loading nodes...");
+    const nodes = graph.getAllNodes();
+
     console.log("Precomputing shortest paths (distance)...");
     const routesByDistance = await graph.dijkstraAll("distance");
 
@@ -62,31 +65,33 @@ async function startServer(port) {
 
     /**
      * GET /
-     * Returns user's IP and approximate location.
+     * Returns all nodes from graph.
      */
     app.get("/", async (req, res) => {
-        try {
-            // Get client IP (works with proxies like ngrok)
-            const ip =
-                req.headers["x-forwarded-for"]?.split(",")[0] ||
-                req.socket.remoteAddress;
+        // try {
+            // // Get client IP (works with proxies like ngrok)
+            // const ip =
+            //     req.headers["x-forwarded-for"]?.split(",")[0] ||
+            //     req.socket.remoteAddress;
+            //
+            // const response = await fetch(`http://ip-api.com/json/${ip}`);
+            // const data = await response.json();
 
-            const response = await fetch(`http://ip-api.com/json/${ip}`);
-            const data = await response.json();
+            res.json(nodes);
 
-            res.json({
-                ip: ip,
-                latitude: data.lat,
-                longitude: data.lon,
-                city: data.city,
-                country: data.country
-            });
-
-        } catch (error) {
-            res.status(500).json({
-                error: "Failed to determine location"
-            });
-        }
+            // res.json({
+            //     ip: ip,
+            //     latitude: data.lat,
+            //     longitude: data.lon,
+            //     city: data.city,
+            //     country: data.country
+            // });
+        //
+        // } catch (error) {
+        //     res.status(500).json({
+        //         error: "Failed to determine location"
+        //     });
+        // }
     });
 
     app.listen(port, () => {
