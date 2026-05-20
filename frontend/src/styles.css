@@ -1,0 +1,13 @@
+header {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.5rem;
+    background-color: #ffffff;
+}
+
+.control {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}

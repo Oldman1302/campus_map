@@ -1,0 +1,27 @@
+/* Settings button styles */
+.settings-button-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.settings-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-button:hover {
+    background: #87a0ed;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

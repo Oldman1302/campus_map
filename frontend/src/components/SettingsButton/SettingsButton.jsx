@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-// import SettingsPanel from './SettingsPanel';
+import "./SettingsButton.css"
+import SettingsPanel from "../SettingsPanel/SettingsPanel";
 
-export default function SettingsButton({ basemap, onBasemapChange, showStats, onToggleStats }) {
+export default function SettingsButton({ basemap, onBasemapChange, showStats, onToggleStats, cursorColor, onCursorColorChange }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     return (
@@ -16,15 +17,17 @@ export default function SettingsButton({ basemap, onBasemapChange, showStats, on
                 </button>
             </div>
 
-            {/*{isSettingsOpen && (*/}
-            {/*    <SettingsPanel*/}
-            {/*        onClose={() => setIsSettingsOpen(false)}*/}
-            {/*        basemap={basemap}*/}
-            {/*        onBasemapChange={onBasemapChange}*/}
-            {/*        showStats={showStats}*/}
-            {/*        onToggleStats={onToggleStats}*/}
-            {/*    />*/}
-            {/*)}*/}
+            {isSettingsOpen && (
+                <SettingsPanel
+                    onClose={() => setIsSettingsOpen(false)}
+                    basemap={basemap}
+                    onBasemapChange={onBasemapChange}
+                    showStats={showStats}
+                    onToggleStats={onToggleStats}
+                    cursorColor={cursorColor}
+                    onCursorColorChange={onCursorColorChange}
+                />
+            )}
         </>
     );
 }

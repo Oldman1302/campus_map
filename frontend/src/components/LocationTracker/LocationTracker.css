@@ -1,0 +1,145 @@
+/* components/LocationTracker/LocationTracker.css */
+
+/* Custom location marker styles */
+.custom-location-marker {
+    background: transparent;
+    cursor: pointer;
+}
+
+.location-marker-container {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.location-marker-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.location-marker-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-out infinite;
+    opacity: 0.6;
+    z-index: 1;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Popup styles - matching MapInfo design */
+.leaflet-popup-content-wrapper {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-tip {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    min-width: 220px;
+}
+
+.location-popup {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 12px;
+}
+
+.location-popup strong {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fbbf24;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+}
+
+.location-popup span {
+    display: block;
+    color: #34d399;
+    margin-bottom: 3px;
+}
+
+.location-popup span:last-child {
+    margin-bottom: 0;
+}
+
+/* Accuracy circle hover effect */
+.leaflet-circle {
+    transition: all 0.3s ease;
+}
+
+.leaflet-circle:hover {
+    opacity: 0.8;
+}
+
+/* Close button styling */
+.leaflet-popup-close-button {
+    color: #9ca3af !important;
+    font-size: 16px !important;
+    padding: 4px 6px !important;
+    transition: color 0.2s ease;
+}
+
+.leaflet-popup-close-button:hover {
+    color: #fbbf24 !important;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .location-marker-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .location-marker-pulse {
+        width: 20px;
+        height: 20px;
+    }
+
+    .leaflet-popup-content {
+        min-width: 180px;
+    }
+
+    .location-popup {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    .location-popup strong {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+}
