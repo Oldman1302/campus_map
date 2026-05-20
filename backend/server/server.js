@@ -1,6 +1,7 @@
 const express = require("express");
 const {loadCampusGraph} = require("../data/campus");
 const {performance} = require('perf_hooks');
+const cors = require("cors");
 
 /**
  * Starts the HTTP server.
@@ -26,6 +27,8 @@ async function startServer(port) {
     console.log(`Precomputation complete (${((t1 - t0) / 1000).toFixed(4)}s).\n`);
 
     const app = express();
+    app.use(cors());
+
 
     /**
      * GET-request to obtain the route from node A to node B according to specific strategy (distance or time)
