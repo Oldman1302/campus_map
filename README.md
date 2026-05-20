@@ -55,7 +55,7 @@ Requests:
 
 This section explains how to make requests to server.
 
-1. GET / - GET-request to obtain all nodes (name, coordinates, boolean value isBuilding) from the graph;
+1. GET / - GET-request to obtain all nodes (name, coordinates, boolean value isBuilding, type) from the graph;
 2. GET /route?from=${fromPosition}&to=${toPosition}&strategy={strategy} - GET-request to obtain path from starting position (parameter fromPosition) to terminal position (parameter toPosition). The path can be the shortest (if parameter strategy = "distance") or the fastest (if parameter strategy = "time")
 e.g. `/route?from=East%20gate&to=Dormitory%20%E2%84%9620%20Entrance%201&strategy=distance`.
 
@@ -75,8 +75,9 @@ attributes:
 
    1.1.4. isBuilding (boolean) - if the location is part of the building we should't use it as a point in a route;
 
-   1.1.5. edges (dictionary) - keeps the distances between the node and its neighbour. Key - neigbour's name (????maybe I should integrate "ID" parameter, because maybe there are locations with the same title????), value - the distance (e.g. {"East gate" : 10.1}).
+   1.1.5. edges (dictionary) - keeps the distances between the node and its neighbour. Key - neigbour's name (????maybe I should integrate "ID" parameter, because maybe there are locations with the same title????), value - the distance (e.g. {"East gate" : 10.1});
 
+      1.1.6. type (string) - keeps the type of node (dormitory, studi building or toilet etc.
 
 
 functions:
@@ -97,7 +98,9 @@ attributes:
 
    2.1.1. name (string) - the name of the graph. It is necessary in the future, as the project deployment involves the task of embedded graphs;
 
-   2.1.2. nodes (dictionary) - keeps the info about nodes. Key - the name of the location, value - object of class Node.
+   2.1.2. nodes (dictionary) - keeps the info about nodes. Key - the name of the location, value - object of class Node;
+
+      2.1.3. type (string) - keeps the type of node (dormitory, studi building or toilet etc.
 
 
 
