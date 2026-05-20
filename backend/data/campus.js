@@ -7,15 +7,15 @@ const Graph = require("../classes/graph");
 async function loadCampusGraph() {
     const campus = new Graph("campus");
 
-    await campus.addNode('Dormitory №20 Entrance 1', [22.365083, 113.539671], null, true);
-    await campus.addNode('Dormitory №20 Entrance 2', [22.362232, 113.544995], null, true);
-    await campus.addNode('Dormitory №20 Entrance 3', [22.365080, 113.540008], null, true);
-    await campus.addNode('Hongyi building', [22.368059, 113.541039], null, true);
-    await campus.addNode('East gate', [22.367168, 113.545280], null, true);
-    await campus.addNode('Building T1', [22.366198, 113.543858], null, true);
-    await campus.addNode('Dormitory №19 Entrance 1', [22.365363, 113.539671], null, true);
-    await campus.addNode('Dormitory №19 Entrance 2', [22.365344, 113.539847], null, true);
-    await campus.addNode('Dormitory №19 Entrance 3', [22.365348, 113.540095], null, true);
+    await campus.addNode('Dormitory №20 Entrance 1', [22.365083, 113.539671], null, true, 'dormitory');
+    await campus.addNode('Dormitory №20 Entrance 2', [22.362232, 113.544995], null, true, 'dormitory');
+    await campus.addNode('Dormitory №20 Entrance 3', [22.365080, 113.540008], null, true, 'dormitory');
+    await campus.addNode('Hongyi building', [22.368059, 113.541039], null, true, 'educational_building');
+    await campus.addNode('East gate', [22.367168, 113.545280], null, true, "gate");
+    await campus.addNode('Building T1', [22.366198, 113.543858], null, true, 'random');
+    await campus.addNode('Dormitory №19 Entrance 1', [22.365363, 113.539671], null, true, 'dormitory');
+    await campus.addNode('Dormitory №19 Entrance 2', [22.365344, 113.539847], null, true, 'dormitory');
+    await campus.addNode('Dormitory №19 Entrance 3', [22.365348, 113.540095], null, true, 'dormitory');
     await campus.addNode('Dormitory №16', [22.365029, 113.539874], null, true);
 
     await campus.addNode('22.367268, 113.544894', [22.367268, 113.544894], null, false);

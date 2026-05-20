@@ -4,13 +4,15 @@ class Node {
      * @param {[number, number]} coordinates  // [lat, lon]
      * @param {Graph|null} subgraph
      * @param {boolean} isBuilding
+     * @param {string|null} type
      */
-    constructor(name, coordinates, subgraph= null, isBuilding = false) {
+    constructor(name, coordinates, subgraph= null, isBuilding = false, type = null) {
         this.name = name;
         this.coordinates = coordinates;  // (x, y) on the map
         this.subgraph = subgraph;  // embedded graph. In the future, it can maybe be extra navigation inside the buildings
         this.isBuilding = !!isBuilding;  // whether this node represents a building
-        this.edges = new Map()  // the distance between the node and its neighbour
+        this.edges = new Map();  // the distance between the node and its neighbour
+        this.type = type;
     }
 
     /**

@@ -16,9 +16,10 @@ class Graph {
      * @param {[number, number]} coordinates
      * @param {Graph|null} subgraph
      * @param {boolean} isBuilding
+     * @param {string|null} type
      */
-    async addNode(name, coordinates, subgraph, isBuilding) {
-        const node = new Node(name, coordinates, subgraph, isBuilding);
+    async addNode(name, coordinates, subgraph, isBuilding, type = null) {
+        const node = new Node(name, coordinates, subgraph, isBuilding, type);
         this.nodes.set(name, node);
         return node
     }
@@ -57,7 +58,8 @@ class Graph {
             nodesArray.push({
                 name: node.name,
                 coordinates: node.coordinates,
-                isBuilding: node.isBuilding || false
+                isBuilding: node.isBuilding || false,
+                type: node.type
             });
         }
 
