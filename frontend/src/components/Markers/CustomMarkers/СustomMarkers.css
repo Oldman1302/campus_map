@@ -1,0 +1,134 @@
+/* Custom marker styles - minimalist version */
+.custom-marker {
+    background: transparent;
+    cursor: pointer;
+}
+
+.marker-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.marker-container:hover {
+    transform: scale(1.2);
+}
+
+.marker-image {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    transition: all 0.2s ease;
+}
+
+/* Tooltip on hover (for all markers) */
+.marker-tooltip {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: monospace;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+.marker-container:hover .marker-tooltip {
+    opacity: 1;
+}
+
+/* Always visible label (for educational_building and dormitory only) */
+.marker-label {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: monospace;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    border-left: 2px solid currentColor;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom popup styles */
+.custom-popup {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    min-width: 150px;
+}
+
+.custom-popup strong {
+    display: block;
+    color: #fbbf24;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.custom-popup p {
+    margin: 0;
+    color: #34d399;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+/* Optional: different border colors for different types */
+.marker-label[data-type="educational_building"] {
+    border-left-color: #3b82f6;
+}
+
+.marker-label[data-type="dormitory"] {
+    border-left-color: #f59e0b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .marker-image {
+        width: 12px;
+        height: 12px;
+    }
+
+    .marker-tooltip {
+        font-size: 9px;
+        top: -24px;
+        padding: 3px 6px;
+    }
+
+    .marker-label {
+        left: 16px;
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+
+    .custom-popup {
+        font-size: 11px;
+        min-width: 130px;
+    }
+
+    .custom-popup strong {
+        font-size: 12px;
+    }
+
+    .custom-popup p {
+        font-size: 10px;
+    }
+}

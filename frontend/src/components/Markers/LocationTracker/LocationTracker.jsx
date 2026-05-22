@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { useLocation } from '../../context/LocationContext';
+import { useLocation } from '../../../context/LocationContext';
 import './LocationTracker.css';
 
 const LocationTracker = ({ cursorColor }) => {
@@ -68,12 +68,6 @@ const LocationTracker = ({ cursorColor }) => {
 
             markerRef.current = marker;
             circleRef.current = circle;
-
-            // Center map on user location only first time
-            if (!markerRef.current.hasBeenCentered) {
-                map.setView(position, map.getZoom());
-                markerRef.current.hasBeenCentered = true;
-            }
         }
 
         // Cleanup on unmount

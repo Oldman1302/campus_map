@@ -3,8 +3,11 @@ import {MapContainer, TileLayer } from "react-leaflet";
 import './Map.css';
 import SettingsButton from "./components/SettingsButton/SettingsButton";
 import MapInfo from "./components/MapInfo/MapInfo";
+import MapController from "./components/MapController"; // it's needed for centralization on our map
 import {saveBasemap, loadBasemap, saveShowStats, loadShowStats, saveCursorColor, loadCursorColor} from "./services/storage";
-import LocationTracker from "./components/LocationTracker/LocationTracker";
+import LocationTracker from "./components/Markers/LocationTracker/LocationTracker";
+import CustomMarkers from "./components/Markers/CustomMarkers/CustomMarkers";
+import {getUserLocation} from "./services/geolocation";
 
 class MapComponent extends React.Component {
     state = {
@@ -18,7 +21,29 @@ class MapComponent extends React.Component {
         maxZoom: 18,
         showStats: loadShowStats(),
         cursorColor: loadCursorColor(),
+        isLocationLoaded: false  // Track if we've tried to get location
     };
+
+    // Get user location once when component mounts
+    componentDidMount() {
+        this.getUserLocationOnce();
+    }
+
+    getUserLocationOnce = async () => {
+        try {
+            const position = await getUserLocation();
+            // Update center with user's location
+            this.setState({
+                centerLat: position.lat,
+                centerLng: position.lng,
+                isLocationLoaded: true
+            });
+            console.log('Map centered on user location:', position.lat, position.lng);
+        } catch (error) {
+            console.log('Could not get user location, Map centered on default position', this.state.centerLat, this.state.centerLng);
+            this.setState({ isLocationLoaded: true });
+        }
+    }
 
     onBMChange = (bm) => {
         this.setState({basemap: bm});
@@ -69,9 +94,12 @@ class MapComponent extends React.Component {
                         url={basemapDict[this.state.basemap]}
                         // url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     />
+                    <CustomMarkers />
                     {/*<Basemap basemap={this.state.basemap} onChange={this.onBMChange}/>*/}
                     {this.state.showStats && <MapInfo/>}
                     <LocationTracker cursorColor={this.state.cursorColor} />
+                    <MapController center={center} zoom={this.state.zoom}
+                    />
                 </MapContainer>
 
                 <SettingsButton
