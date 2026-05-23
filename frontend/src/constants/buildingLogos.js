@@ -3,6 +3,7 @@ export const BUILDING_LOGOS = {
     gate: '/images/door.png',
     dormitory: '/images/dorm.png',
     toilet: '/images/public_toilet.png',
+    cafe: '/images/plate.png',
     // restaurant: '🍽️',
     // cafe: '☕',
     // library: '📚',

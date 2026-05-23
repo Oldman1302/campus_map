@@ -32,11 +32,11 @@ async function loadCampusGraph() {
     await campus.addNode('Dormitory №20 Entrance 3', [22.365094, 113.540047], null, true, 'gate');
     await campus.addNode('Dormitory №20 Public Toilet', [22.365094, 113.540198], null, true, 'toilet');
 
-    await campus.addNode('Xiaomian noodles', [22.366213, 113.540067], null, true, 'educational_building');
+    await campus.addNode('Xiaomian noodles', [22.366213, 113.540067], null, true, 'cafe');
     await campus.addNode('Xiaomian noodles Entrance 1', [22.366184, 113.540168], null, true, 'gate');
     await campus.addNode('Xiaomian noodles Entrance 2', [22.366230, 113.540168], null, true, 'gate');
 
-    await campus.addNode('Muslim cafe', [22.365433, 113.540379], null, true, 'gate'); // new (poi
+    await campus.addNode('Muslim cafe', [22.365433, 113.540379], null, true, 'cafe'); // new (poi
 
     await campus.addNode('Hongyi building', [22.370710, 113.535770], null, true, 'educational_building');
 
