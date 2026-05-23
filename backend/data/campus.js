@@ -7,24 +7,44 @@ const Graph = require("../classes/graph");
 async function loadCampusGraph() {
     const campus = new Graph("campus");
 
-    await campus.addNode('Dormitory №20', [22.365056, 113.539878], null, true, 'gate');
-    await campus.addNode('Dormitory №20 Entrance 1', [22.365094, 113.539715], null, true, 'gate');
-    await campus.addNode('Dormitory №20 Entrance 2', [22.365094, 113.539898], null, true, 'gate');
-    await campus.addNode('Dormitory №20 Entrance 3', [22.365094, 113.540047], null, true, 'gate');
-        await campus.addNode('Dormitory №20 Public Toilet', [22.365094, 113.540198], null, true, 'toilet');
+    await campus.addNode('Dormitory №16', [22.365056, 113.540755], null, true, 'dormitory');
 
-    await campus.addNode('Hongyi building', [22.370710, 113.535770], null, true, 'educational_building');
+    await campus.addNode('Dormitory №17', [22.365993, 113.539877], null, true, 'dormitory');
+    await campus.addNode('Dormitory №17 Entrance 1', [22.365890, 113.539663], null, true, 'gate');
+    await campus.addNode('Dormitory №17 Entrance 2', [22.365897, 113.539955], null, true, 'gate');
+    await campus.addNode('Dormitory №17 Entrance 3', [22.365919, 113.540135], null, true, 'gate');
+    await campus.addNode('Dormitory №17 Entrance 4', [22.366019, 113.539955], null, true, 'gate');
 
-    await campus.addNode('East gate', [22.367168, 113.545280], null, true, "default"); // because main  East Gate is not working, it's closed
-
-    await campus.addNode('Building T1', [22.366198, 113.543858], null, true, 'default');
+    await campus.addNode('Dormitory №18', [22.365642, 113.539881], null, true, 'dormitory');
+    await campus.addNode('Dormitory №18 Entrance 1', [22.365587, 113.539656], null, true, 'gate');
+    await campus.addNode('Dormitory №18 Entrance 2', [22.365590, 113.539955], null, true, 'gate');
+    await campus.addNode('Dormitory №18 Entrance 3', [22.365612, 113.540138], null, true, 'gate');
+    await campus.addNode('Dormitory №18 Entrance 4', [22.365717, 113.539955], null, true, 'gate');
 
     await campus.addNode('Dormitory №19', [22.365364, 113.539877], null, true, 'dormitory');
     await campus.addNode('Dormitory №19 Entrance 1', [22.365313, 113.539671], null, true, 'gate');
     await campus.addNode('Dormitory №19 Entrance 2', [22.365313, 113.539847], null, true, 'gate');
     await campus.addNode('Dormitory №19 Entrance 3', [22.365313, 113.540095], null, true, 'gate');
 
-    await campus.addNode('Dormitory №16', [22.365056, 113.540755], null, true, 'dormitory');
+    await campus.addNode('Dormitory №20', [22.365056, 113.539878], null, true, 'dormitory');
+    await campus.addNode('Dormitory №20 Entrance 1', [22.365094, 113.539715], null, true, 'gate');
+    await campus.addNode('Dormitory №20 Entrance 2', [22.365094, 113.539898], null, true, 'gate');
+    await campus.addNode('Dormitory №20 Entrance 3', [22.365094, 113.540047], null, true, 'gate');
+    await campus.addNode('Dormitory №20 Public Toilet', [22.365094, 113.540198], null, true, 'toilet');
+
+    await campus.addNode('Xiaomian noodles', [22.366213, 113.540067], null, true, 'educational_building');
+    await campus.addNode('Xiaomian noodles Entrance 1', [22.366184, 113.540168], null, true, 'gate');
+    await campus.addNode('Xiaomian noodles Entrance 2', [22.366230, 113.540168], null, true, 'gate');
+
+    await campus.addNode('Muslim cafe', [22.365433, 113.540379], null, true, 'gate'); // new (poi
+
+    await campus.addNode('Hongyi building', [22.370710, 113.535770], null, true, 'educational_building');
+
+    await campus.addNode('East gate', [22.367168, 113.545280], null, true, "default"); // because main  East Gate is not working, it's closed
+
+    await campus.addNode('Building T1', [22.366198, 113.543858], null, true, 'dormitory');
+
+
 
 
     await campus.addNode('22.367268, 113.544894', [22.367268, 113.544894], null, false);
@@ -53,6 +73,24 @@ async function loadCampusGraph() {
     await campus.addNode('22.365823, 113.540177', [22.365823, 113.540177], null, false);
     await campus.addNode('22.365201, 113.539570', [22.365201, 113.539570], null, false);
     await campus.addNode('22.365443, 113.539570', [22.365443, 113.539570], null, false);
+    await campus.addNode('22.365741, 113.539574', [22.365741, 113.539574], null, false);
+    await campus.addNode('22.365743, 113.539635', [22.365743, 113.539635], null, false);
+    await campus.addNode('22.365730, 113.539635', [22.365730, 113.539635], null, false);
+    await campus.addNode('22.365730, 113.539928', [22.365730, 113.539928], null, false);
+    await campus.addNode('22.365730, 113.539991', [22.365730, 113.539991], null, false);
+    await campus.addNode('22.365750, 113.540051', [22.365750, 113.540051], null, false);
+    await campus.addNode('22.365818, 113.540140', [22.365818, 113.540140], null, false);
+    await campus.addNode('22.365822, 113.539957', [22.365822, 113.539957], null, false);
+    await campus.addNode('22.365818, 113.539688', [22.365818, 113.539688], null, false);
+    await campus.addNode('22.366041, 113.539567', [22.366041, 113.539567], null, false);
+    await campus.addNode('22.366041, 113.539796', [22.366041, 113.539796], null, false);
+    await campus.addNode('22.366041, 113.539950', [22.366041, 113.539950], null, false);
+    await campus.addNode('22.366055, 113.540191', [22.366055, 113.540191], null, false);
+    await campus.addNode('22.366152, 113.540214', [22.366152, 113.540214], null, false);
+    await campus.addNode('22.366218, 113.540223', [22.366218, 113.540223], null, false);
+    await campus.addNode('22.365434, 113.540308', [22.365434, 113.540308], null, false);
+
+
     await campus.addNode('22.365445, 113.539863', [22.365445, 113.539863], null, false);
     await campus.addNode('22.365461, 113.540048', [22.365461, 113.540048], null, false);
     await campus.addNode('22.365435, 113.540232', [22.365435, 113.540232], null, false);
@@ -103,6 +141,41 @@ async function loadCampusGraph() {
     await campus.addEdge('22.365503, 113.539959', '22.365506, 113.540089', 14, 18);
     await campus.addEdge('22.365506, 113.540089', '22.365461, 113.540048', 6, 9);
     await campus.addEdge('22.365506, 113.540089', '22.365507, 113.540227', 14, 8);
+    await campus.addEdge('22.365741, 113.539574', '22.365443, 113.539570', 28, 26);
+    await campus.addEdge('22.365741, 113.539574', '22.365743, 113.539635', 1, 5);
+    await campus.addEdge('22.365730, 113.539635', '22.365743, 113.539635', 1, 3);
+    await campus.addEdge('22.365730, 113.539635', '22.365730, 113.539928', 52, 29);
+    await campus.addEdge('22.365730, 113.539991', '22.365730, 113.539928', 2, 5);
+    await campus.addEdge('22.365730, 113.539991', '22.365750, 113.540051', 6, 7);
+    await campus.addEdge('22.365748, 113.540189', '22.365750, 113.540051', 9, 13);
+    await campus.addEdge('22.365818, 113.540140', '22.365750, 113.540051', 3, 6);
+    await campus.addEdge('22.365818, 113.540140', '22.365823, 113.540177', 2, 4);
+    await campus.addEdge('22.365818, 113.540140', 'Dormitory №17', 7, 7);
+    await campus.addEdge('22.365818, 113.540140', 'Dormitory №17 Entrance 3', 7, 7);
+    await campus.addEdge('22.365818, 113.540140', '22.365822, 113.539957', 13, 17);
+    await campus.addEdge('22.365822, 113.539957', 'Dormitory №17', 4, 4); // new
+    await campus.addEdge('22.365822, 113.539957', 'Dormitory №17 Entrance 2', 4, 4);
+    await campus.addEdge('22.365818, 113.539688', '22.365822, 113.539957', 15, 20);
+    await campus.addEdge('22.365818, 113.539688', 'Dormitory №17', 4, 4);
+    await campus.addEdge('22.365818, 113.539688', 'Dormitory №17 Entrance 1', 4, 4);
+    await campus.addEdge('22.365818, 113.539688', '22.365743, 113.539635', 3, 5);
+    await campus.addEdge('22.365741, 113.539574', '22.366041, 113.539567', 32, 28);
+    await campus.addEdge('22.366041, 113.539796', '22.366041, 113.539567', 20, 22);
+    await campus.addEdge('22.366041, 113.539796', '22.366041, 113.539950', 8, 11);
+    await campus.addEdge('22.366041, 113.539950', 'Dormitory №17', 2, 4);
+    await campus.addEdge('22.366041, 113.539950', 'Dormitory №17 Entrance 4', 2, 4);
+    await campus.addEdge('22.366055, 113.540191', '22.366041, 113.539950', 16, 24);
+    await campus.addEdge('22.366055, 113.540191', '22.365823, 113.540177', 25, 19);
+    await campus.addEdge('22.366055, 113.540191', '22.366152, 113.540214', 4, 7);
+    await campus.addEdge('Xiaomian noodles', '22.366152, 113.540214', 3, 4);
+    await campus.addEdge('Xiaomian noodles Entrance 1', '22.366152, 113.540214', 3, 4);
+    await campus.addEdge('22.366218, 113.540223', '22.366152, 113.540214', 3, 4);
+    await campus.addEdge('Xiaomian noodles', '22.366218, 113.540223', 4, 5);
+    await campus.addEdge('Xiaomian noodles Entrance 2', '22.366218, 113.540223', 4, 5);
+    await campus.addEdge('Xiaomian noodles Entrance 1', 'Xiaomian noodles Entrance 2', 3, 4);
+    await campus.addEdge('22.365435, 113.540232', '22.365434, 113.540308', 5, 8);
+    await campus.addEdge('Muslim cafe', '22.365434, 113.540308', 8, 12);
+
     await campus.addEdge('22.365457, 113.539686', '22.365443, 113.539570', 11, 14);
     await campus.addEdge('22.365443, 113.539570', '22.365201, 113.539570', 27, 27);
     await campus.addEdge('22.365201, 113.539570', '22.365189, 113.539670', 10, 14); // ???
@@ -121,6 +194,15 @@ async function loadCampusGraph() {
     await campus.addEdge('22.365175, 113.540113', '22.365165, 113.540014', 8, 8);
     await campus.addEdge('Dormitory №19 Entrance 3', '22.365175, 113.540113', 19, 13);
     await campus.addEdge('22.365175, 113.540113', '22.365162, 113.540256', 13, 10);
+
+    await campus.addEdge('22.365495, 113.539687', 'Dormitory №18', 6, 7);
+    await campus.addEdge('22.365495, 113.539687', 'Dormitory №18 Entrance 1', 6, 7);
+    await campus.addEdge('22.365503, 113.539959', 'Dormitory №18', 6, 6);
+    await campus.addEdge('22.365503, 113.539959', 'Dormitory №18 Entrance 2', 6, 6);
+    await campus.addEdge('22.365506, 113.540089', 'Dormitory №18', 6, 7);
+    await campus.addEdge('22.365506, 113.540089', 'Dormitory №18 Entrance 3', 6, 7);
+    await campus.addEdge('Dormitory №18', '22.365730, 113.539928', 2, 5);
+    await campus.addEdge('Dormitory №18 Entrance 4', '22.365730, 113.539928', 2, 5);
 
     // plugs
     await campus.addEdge('Dormitory №20 Entrance 2', 'Hongyi building', 950, 3);

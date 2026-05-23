@@ -38,6 +38,42 @@ async function startServer(port) {
     app.get("/route", (req, res) => {
         const { from, to, strategy = "distance" } = req.query;
 
+        // function for coordinate validation
+        const validateCoordinates = (coordinate) => {
+            if (!coordinate || typeof coordinate !== 'string') {
+                return null;
+            }
+
+            const parts = coordinate.split(',');
+            if (parts.length !== 2) {
+                return null;
+            }
+
+            // parse numbers
+            const lat = parseFloat(parts[0].trim());
+            const lng = parseFloat(parts[1].trim());
+
+            // Check numbers
+            if (isNaN(lat) || isNaN(lng)) {
+                return null;
+            }
+
+            if (lat < 22 || lat > 23 || lng < 113 || lng > 114) {
+                return null;
+            }
+
+            return [lat, lng];
+        };
+
+        const getClosestNodeWithDistance = (coordinate) => {
+            const coordinates = validateCoordinates(coordinate);
+            if (!coordinates) {
+                return null;
+            }
+
+            return graph.findClosestNode(coordinates);
+        };
+
         if (!from || !to) {
             return res.status(400).json({
                 error: "Parameters 'from' and 'to' are required"
@@ -54,15 +90,84 @@ async function startServer(port) {
             ? routesByDistance
             : routesByTime;
 
-        if (!routes[from] || !routes[from][to]) {
+        // Starting point
+        let fromNode = from;
+        let fromExtraDistance = 0;
+        let fromPath = null;
+
+        if (!routes[from]) {
+            const closest = getClosestNodeWithDistance(from);
+            if (closest) {
+                fromNode = closest.name;
+                fromExtraDistance = closest.distance;
+                fromPath = `${from} -> ${fromNode}`;
+            } else {
+                return res.status(400).json({
+                    error: "Invalid 'from' parameter: neither a valid node name nor valid coordinates"
+                });
+            }
+        }
+
+        // Destination point
+        let toNode = to;
+        let toExtraDistance = 0;
+        let toPath = null;
+
+        if (!routes[to]) {
+            const closest = getClosestNodeWithDistance(to);
+            if (closest) {
+                toNode = closest.name;
+                toExtraDistance = closest.distance;
+                toPath = `${toNode} -> ${to}`;
+            } else {
+                return res.status(400).json({
+                    error: "Invalid 'to' parameter: neither a valid node name nor valid coordinates"
+                });
+            }
+        }
+
+        // Check if route exists between the found nodes
+        if (!routes[fromNode] || !routes[fromNode][toNode]) {
             return res.status(404).json({
-                error: "Route not found"
+                error: "Route not found between the specified points",
+                from_node: fromNode,
+                to_node: toNode
             });
+        }
+
+        // Get the main route
+        const route = routes[fromNode][toNode];
+
+        // Add extra distances (from user points to nearest nodes)
+        const totalDistance = route.distance + fromExtraDistance + toExtraDistance;
+
+        // Average walking speed ~ 1.4 m/s (5 km/h) - can be adjusted
+        const AVERAGE_WALKING_SPEED = 1.4; // m/s
+
+        let totalTime = route.time || 0;
+        if (fromExtraDistance || toExtraDistance) {
+            totalTime += Math.round((fromExtraDistance + toExtraDistance) / AVERAGE_WALKING_SPEED);
+        }
+
+
+        // Build the full path
+        let fullPath = route.path || [];
+
+        // Add start point to the beginning of the path
+        if (fromPath) {
+            fullPath = fromPath + " -> " + fullPath;
+        }
+
+        // Add destination point to the end of the path
+        if (toPath) {
+            fullPath = fullPath  + " -> " + toPath;
         }
 
         return res.json({
             strategy,
-            ...routes[from][to]
+            distance: Math.round(totalDistance),
+            time: totalTime,
+            path: fullPath
         });
     })
 
