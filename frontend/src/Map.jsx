@@ -1,13 +1,14 @@
 import React from 'react';
 import {MapContainer, TileLayer } from "react-leaflet";
 import './Map.css';
-import SettingsButton from "./components/SettingsButton/SettingsButton";
+import SettingsButton from "./components/Buttons/SettingsButton/SettingsButton";
 import MapInfo from "./components/MapInfo/MapInfo";
 import MapController from "./components/MapController"; // it's needed for centralization on our map
 import {saveBasemap, loadBasemap, saveShowStats, loadShowStats, saveCursorColor, loadCursorColor} from "./services/storage";
 import LocationTracker from "./components/Markers/LocationTracker/LocationTracker";
 import CustomMarkers from "./components/Markers/CustomMarkers/CustomMarkers";
 import {getUserLocation} from "./services/geolocation";
+import MyLocationButton from "./components/Buttons/MyLocationButton/MyLocationButton";
 
 class MapComponent extends React.Component {
     state = {
@@ -18,7 +19,7 @@ class MapComponent extends React.Component {
         southEast: [22.35961, 113.546551],
         basemap: loadBasemap(),
         minZoom: 14,
-        maxZoom: 18,
+        maxZoom: 19,
         showStats: loadShowStats(),
         cursorColor: loadCursorColor(),
         isLocationLoaded: false  // Track if we've tried to get location
@@ -100,16 +101,19 @@ class MapComponent extends React.Component {
                     <LocationTracker cursorColor={this.state.cursorColor} />
                     <MapController center={center} zoom={this.state.zoom}
                     />
-                </MapContainer>
 
-                <SettingsButton
-                    basemap={this.state.basemap}
-                    onBasemapChange={this.onBMChange}
-                    showStats={this.state.showStats}
-                    onToggleStats={this.onToggleStats}
-                    cursorColor={this.state.cursorColor}
-                    onCursorColorChange={this.onCursorColorChange}
-                />
+                    <SettingsButton
+                        basemap={this.state.basemap}
+                        onBasemapChange={this.onBMChange}
+                        showStats={this.state.showStats}
+                        onToggleStats={this.onToggleStats}
+                        cursorColor={this.state.cursorColor}
+                        onCursorColorChange={this.onCursorColorChange}
+                    />
+
+                    <MyLocationButton />
+
+                </MapContainer>
             </>
         )
     }

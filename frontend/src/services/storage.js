@@ -44,7 +44,11 @@ export function saveShowStats(showStats) {
 export function loadShowStats() {
     try {
         const saved = localStorage.getItem(STORAGE_KEYS.SHOW_STATS);
-        return saved || DEFAULTS.showStats;
+        // if (saved === null) {
+        //     return DEFAULTS.showStats;  // Return boolean false
+        // }
+        // // Parse the saved string to boolean
+        return JSON.parse(saved) || DEFAULTS.showStats;
     } catch (error) {
         console.error('Failed to load showStats:', error);
     }

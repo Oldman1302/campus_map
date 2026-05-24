@@ -1,12 +1,11 @@
-/* Settings button styles */
-.settings-button-container {
+/* Base button styles - shared across all button components */
+.base-button-container {
     position: fixed;
-    top: 20px;
     right: 20px;
     z-index: 1000;
 }
 
-.settings-button {
+.base-button {
     width: 44px;
     height: 44px;
     border-radius: 8px;
@@ -21,7 +20,24 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.settings-button:hover {
+.base-button:hover {
     background: #87a0ed;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.base-button:active {
+    transform: scale(0.95);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .base-button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .base-button-container {
+        right: 15px;
+    }
 }

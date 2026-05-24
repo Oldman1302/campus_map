@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
-import "./SettingsButton.css"
-import SettingsPanel from "../SettingsPanel/SettingsPanel";
+import '../Button.css';
+import './SettingsButton.css';
+import SettingsPanel from "../../SettingsPanel/SettingsPanel";
 
-export default function SettingsButton({ basemap, onBasemapChange, showStats, onToggleStats, cursorColor, onCursorColorChange }) {
+export default function SettingsButton({
+                                           basemap,
+                                           onBasemapChange,
+                                           showStats,
+                                           onToggleStats,
+                                           cursorColor,
+                                           onCursorColorChange
+                                       }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     return (
         <>
-            <div className="settings-button-container">
+            <div className="settings-button-container base-button-container">
                 <button
-                    className="settings-button"
+                    className="settings-button base-button"
                     onClick={() => setIsSettingsOpen(true)}
                     title="Settings"
                 >
