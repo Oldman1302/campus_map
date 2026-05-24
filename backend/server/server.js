@@ -100,7 +100,7 @@ async function startServer(port) {
             if (closest) {
                 fromNode = closest.name;
                 fromExtraDistance = closest.distance;
-                fromPath = `${from}`;
+                fromPath = from;
             } else {
                 return res.status(400).json({
                     error: "Invalid 'from' parameter: neither a valid node name nor valid coordinates"
@@ -118,7 +118,7 @@ async function startServer(port) {
             if (closest) {
                 toNode = closest.name;
                 toExtraDistance = closest.distance;
-                toPath = `${to}`;
+                toPath = to;
             } else {
                 return res.status(400).json({
                     error: "Invalid 'to' parameter: neither a valid node name nor valid coordinates"

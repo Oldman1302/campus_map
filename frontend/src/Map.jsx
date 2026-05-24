@@ -1,5 +1,5 @@
 import React from 'react';
-import {MapContainer, TileLayer } from "react-leaflet";
+import {MapContainer, TileLayer} from "react-leaflet";
 import './Map.css';
 import SettingsButton from "./components/Buttons/SettingsButton/SettingsButton";
 import MapInfo from "./components/MapInfo/MapInfo";
@@ -68,6 +68,13 @@ class MapComponent extends React.Component {
         }));
     }
 
+    onCenterChange = (lat, lng) => {
+        this.setState({
+            centerLat: lat,
+            centerLng: lng
+        });
+    }
+
     render() {
         const center = [this.state.centerLat, this.state.centerLng];
         const bounds = [this.state.northWest, this.state.southEast];
@@ -111,7 +118,7 @@ class MapComponent extends React.Component {
                         onCursorColorChange={this.onCursorColorChange}
                     />
 
-                    <MyLocationButton />
+                    <MyLocationButton onCenterChange={this.onCenterChange} />
 
                 </MapContainer>
             </>
