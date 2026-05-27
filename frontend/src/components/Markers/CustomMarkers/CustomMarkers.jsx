@@ -1,14 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 import { BUILDING_LOGOS } from "../../../constants/buildingLogos";
-import { fetchMarkers } from "../../../services/markersAPI";
 import './СustomMarkers.css';
 import {ALWAYS_VISIBLE_TYPES} from "../../../constants/visibleTypes";
 
-export default function CustomMarkers() {
+export default function CustomMarkers({ markers=[] }) {
     const map = useMap();
-    const [markers, setMarkers] = useState([]);
     const markersRef = useRef([]);
 
     // Get image path by type from BUILDING_LOGOS
@@ -22,25 +20,17 @@ export default function CustomMarkers() {
         return ALWAYS_VISIBLE_TYPES.includes(type);
     };
 
-    // Load markers from server
-    useEffect(() => {
-        const loadMarkers = async () => {
-            try {
-                const data = await fetchMarkers();
-                const buildingMarkers = data.filter(point => point.isBuilding === true);
-                setMarkers(buildingMarkers);
-            } catch (err) {
-                console.error('Error loading markers:', err);
-                setMarkers([]);
-            }
-        };
-
-        loadMarkers();
-    }, []);
-
     // Add markers to map when data is loaded
     useEffect(() => {
         if (!map || !markers.length) return;
+
+        // Filter only building markers
+        const buildingMarkers = markers.filter(point => point.isBuilding === true);
+
+        if (buildingMarkers.length === 0) {
+            console.log('No building markers to display');
+            return;
+        }
 
         // Create custom marker icon with image
         const createMarkerIcon = (type, name, coordinates) => {
@@ -53,22 +43,17 @@ export default function CustomMarkers() {
                     <img src="${imagePath}" alt="${type || 'marker'}" class="marker-image" />
             `;
 
-            if (!alwaysShow) {
-                markerHtml += `
+            markerHtml += `
                             <div class="marker-tooltip">
-                                <p>${name}</p>
                                 <p>${coordinates?.[0]}, ${coordinates?.[1]}</p>
                             </div>
                 `;
-            } else {
+
+            if (alwaysShow) {
                 markerHtml += `<div class="marker-label">${name}</div>`;
-                markerHtml += `
-                            <div class="marker-tooltip">
-                                <p>${coordinates?.[0]}, ${coordinates?.[1]}</p>
-                            </div>
-                `;
             }
 
+            markerHtml += `</div>`;
 
             return L.divIcon({
                 className: 'custom-marker',
@@ -88,32 +73,13 @@ export default function CustomMarkers() {
         markersRef.current = [];
 
         // Add new markers
-        const newMarkers = markers.map(point => {
-            console.log(``);
-            console.log(`point: ${point.type}`);
-            console.log(`should show popud? -${!shouldAlwaysShowLabel(point.type)}`);
+        markersRef.current = buildingMarkers.map(point => {
             const [lat, lng] = point.coordinates;
             const position = [lat, lng];
             const icon = createMarkerIcon(point.type, point.name, point.coordinates);
 
-            const marker = L.marker(position, { icon }).addTo(map);
-
-            // Add popup only if type should NOT always show label AND description exists
-            // For types that always show label (educational_building, dormitory) - no popup
-//             if (!shouldAlwaysShowLabel(point.type)) {
-//                 console.log('✅ Adding popup for:', point.type);
-//                 marker.bindPopup(`
-//                     <div class="custom-popup">
-//                         <strong>${point.name}</strong>
-// <!--                        <p>${point.description}</p>-->
-//                     </div>
-//                 `);
-//             }
-
-            return marker;
+            return L.marker(position, { icon }).addTo(map);
         });
-
-        markersRef.current = newMarkers;
 
         // Cleanup on unmount
         return () => {

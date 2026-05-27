@@ -16,28 +16,77 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: background 0.5s ease, transform 0.1s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
 }
 
+/* Hover state - only for desktop */
 .base-button:hover {
     background: #87a0ed;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: background 0.5s ease, box-shadow 0.2s ease;
 }
 
+/* Active/pressed state - instant feedback */
 .base-button:active {
+    background: #6b8cdf;
     transform: scale(0.95);
+    transition: background 0s, transform 0.05s;
 }
 
-/* Responsive adjustments */
+/* Mobile-specific adjustments */
 @media (max-width: 768px) {
     .base-button {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         font-size: 20px;
     }
 
     .base-button-container {
         right: 15px;
     }
+
+    /* Disable focus completely on mobile */
+    .base-button:focus {
+        outline: none;
+        background: transparent;
+    }
+
+    /* Force white background by default */
+    .base-button {
+        background: white !important;
+    }
+
+    /* Override with blue only during active press */
+    .base-button:active {
+        background: #6b8cdf !important;
+        transform: scale(0.95);
+    }
+}
+
+/* Remove focus outline */
+.base-button:focus {
+    outline: none;
+}
+
+/* Keep focus outline only for keyboard navigation on desktop */
+@media (min-width: 769px) {
+    .base-button:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+}
+
+/* Loading state */
+.base-button.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.base-button.loading:active {
+    transform: none;
+    background: white;
 }

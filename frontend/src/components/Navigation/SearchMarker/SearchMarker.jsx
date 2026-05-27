@@ -1,0 +1,224 @@
+import {useEffect, useState, useRef} from "react";
+import {useMap} from "react-leaflet";
+import "./SearchMarker.css"
+
+export default function SearchMarker({ markers = [], isLoading = false }) {
+    const map = useMap();
+    const [searchInput, setSearchInput] = useState('');  // Renamed from searchTerm
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [searchWidth, setSearchWidth] = useState('auto');
+    const inputRef = useRef(null);
+    const resultsRef = useRef(null);
+
+    // Calculate available width for search bar
+    useEffect(() => {
+        const calculateWidth = () => {
+            const screenWidth = window.innerWidth;
+            const rightButtonsWidth = 44 + 20; // Button width (44px) + right margin (20px)
+            const leftMargin = 20; // Left margin for safety
+            const availableWidth = screenWidth - (rightButtonsWidth + leftMargin) - 40; // -40 for extra padding
+
+            if (screenWidth <= 768) {
+                // Mobile: use percentage but ensure it doesn't overlap with buttons
+                setSearchWidth(`calc(100% - ${rightButtonsWidth + leftMargin + 70}px)`);
+            } else {
+                // Desktop: fixed max width but responsive
+                const calculatedWidth = Math.min(availableWidth, 500);
+                setSearchWidth(`${calculatedWidth}px`);
+            }
+        };
+
+        calculateWidth();
+        window.addEventListener('resize', calculateWidth);
+        return () => window.removeEventListener('resize', calculateWidth);
+    }, []);
+
+    // Prevent scroll events from reaching the map
+    useEffect(() => {
+        const resultsElement = resultsRef.current;
+
+        if (resultsElement) {
+            const preventScrollPropagation = (e) => {
+                e.stopPropagation();
+            };
+
+            // Prevent wheel/scroll events on desktop
+            resultsElement.addEventListener('wheel', preventScrollPropagation, { passive: false });
+
+            // Prevent touch events on mobile
+            resultsElement.addEventListener('touchstart', preventScrollPropagation);
+            resultsElement.addEventListener('touchmove', preventScrollPropagation);
+            resultsElement.addEventListener('touchend', preventScrollPropagation);
+
+            return () => {
+                resultsElement.removeEventListener('wheel', preventScrollPropagation);
+                resultsElement.removeEventListener('touchstart', preventScrollPropagation);
+                resultsElement.removeEventListener('touchmove', preventScrollPropagation);
+                resultsElement.removeEventListener('touchend', preventScrollPropagation);
+            };
+        }
+    }, [isSearchOpen, searchResults]);
+
+    // Filter markers based on search input
+    useEffect(() => {
+        if (!searchInput.trim()) {
+            setSearchResults(markers);
+            setSelectedIndex(-1);
+            return;
+        }
+
+        const input = searchInput.toLowerCase();
+        const filtered = markers.filter(marker =>
+            marker.name?.toLowerCase().includes(input) ||
+            marker.type?.toLowerCase().includes(input)
+        );
+        setSearchResults(filtered);
+        setSelectedIndex(-1);
+    }, [searchInput, markers]);
+
+    // Handle keyboard navigation
+    const handleKeyDown = (e) => {
+        if (!searchResults.length) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex(prev =>
+                    prev < searchResults.length - 1 ? prev + 1 : prev
+                );
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (selectedIndex >= 0 && searchResults[selectedIndex]) {
+                    handleSelectMarker(searchResults[selectedIndex]);
+                } else if (searchResults[0]) {
+                    handleSelectMarker(searchResults[0]);
+                }
+                break;
+            case 'Escape':
+                setIsSearchOpen(false);
+                setSearchInput('');
+                setSearchResults([]);
+                inputRef.current?.blur();
+                break;
+            default:
+                break;
+        }
+    };
+
+    // JUST A PLUG NOW. IN FUTURE IT SHOULD BE CONSTRUCTION ON PATH
+    // Handle marker selection - fly to marker
+    const handleSelectMarker = (marker) => {
+        const [lat, lng] = marker.coordinates;
+
+        // Fly to marker location
+        map.flyTo([lat, lng], 18, {
+            duration: 1.5,
+            animate: true
+        });
+
+        // Clear search
+        setSearchInput(marker.name);  // Clear search input
+        setSearchResults([]);
+        setIsSearchOpen(false);
+
+        console.log('Selected marker:', marker.name, marker.type);
+    };
+
+    // Placeholder for future navigation function
+    const handleBuildRoute = (marker) => {
+        // TODO: Navigation will be implemented later
+        console.log('TODO: Build route to:', marker.name, marker.coordinates);
+        alert(`🚧 Navigation to "${marker.name}" will be implemented soon!`);
+    };
+
+    return (
+        <div className="search-container">
+            <div className="search-wrapper" style={{width: searchWidth}}>
+                <div className="search-input-wrapper">
+                    <span className="search-icon">🔍</span>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        className="search-input"
+                        placeholder="Search..."
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onFocus={() => setIsSearchOpen(true)}
+                        onKeyDown={handleKeyDown}
+                    />
+                    {searchInput && (
+                        <button
+                            className="search-clear"
+                            onClick={() => {
+                                setSearchInput('');
+                                setSearchResults(markers);
+                                inputRef.current?.focus();
+                            }}
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
+
+                {isSearchOpen && (
+                    <div
+                        className="search-results"
+                        ref={resultsRef}
+                        onWheel={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                    >
+                        {isLoading ? (
+                            <div className="search-loading">Loading markers...</div>
+                        ) : searchResults.length === 0 ? (
+                            <div className="search-no-results">
+                                {searchInput ? `No results found for "${searchInput}"` : 'Start typing to search...'}
+                            </div>
+                        ) : (
+                            <>
+                                {/* Results list */}
+                                {searchResults.map((marker, index) => (
+                                    <div
+                                        key={marker.id || index}
+                                        className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
+                                        onMouseEnter={() => setSelectedIndex(index)}
+                                        onClick={() => handleSelectMarker(marker)}
+                                    >
+                                        <div className="result-info">
+                                            <div className="result-name">{marker.name}</div>
+                                            <div className="result-type">{marker.type?.replace('_', ' ') || 'Location'}</div>
+                                        </div>
+                                        <button
+                                            className="result-route-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBuildRoute(marker);
+                                            }}
+                                            title="Build route to this location"
+                                        >
+                                            🧭
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {/* Results counter - at the bottom */}
+                                {searchInput && searchResults.length > 0 && (
+                                    <div className="results-footer">
+                                        Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
