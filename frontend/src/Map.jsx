@@ -9,6 +9,8 @@ import LocationTracker from "./components/Markers/LocationTracker/LocationTracke
 import CustomMarkers from "./components/Markers/CustomMarkers/CustomMarkers";
 import {getUserLocation} from "./services/geolocation";
 import MyLocationButton from "./components/Buttons/MyLocationButton/MyLocationButton";
+import { fetchMarkers} from "./services/markersAPI";
+import SearchMarker from "./components/Navigation/SearchMarker/SearchMarker";
 
 class MapComponent extends React.Component {
     state = {
@@ -22,12 +24,15 @@ class MapComponent extends React.Component {
         maxZoom: 19,
         showStats: loadShowStats(),
         cursorColor: loadCursorColor(),
-        isLocationLoaded: false  // Track if we've tried to get location
+        isLocationLoaded: false,  // Track if we've tried to get location
+        markers: [],
+        isLoadingMarkers: true
     };
 
-    // Get user location once when component mounts
+    // Get user location and markers once when component mounts
     componentDidMount() {
         this.getUserLocationOnce();
+        this.loadAllMarkers();
     }
 
     getUserLocationOnce = async () => {
@@ -43,6 +48,23 @@ class MapComponent extends React.Component {
         } catch (error) {
             console.log('Could not get user location, Map centered on default position', this.state.centerLat, this.state.centerLng);
             this.setState({ isLocationLoaded: true });
+        }
+    }
+
+    loadAllMarkers = async () => {
+        try {
+            const data = await fetchMarkers();
+            this.setState({
+                markers: data,
+                isLoadingMarkers: false
+            });
+            console.log('All markers loaded:', data.length);
+        } catch (error) {
+            console.error('Error loading markers:', error);
+            this.setState({
+                allMarkers: [],
+                isLoadingMarkers: false
+            });
         }
     }
 
@@ -97,12 +119,13 @@ class MapComponent extends React.Component {
                               maxZoom={this.state.maxZoom}
                               className="map-container"
                 >
+                    <SearchMarker markers={this.state.markers} isLoading={this.state.isLoadingMarkers} />
                     <TileLayer
                         // attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url={basemapDict[this.state.basemap]}
                         // url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     />
-                    <CustomMarkers />
+                    <CustomMarkers markers={this.state.markers} />
                     {/*<Basemap basemap={this.state.basemap} onChange={this.onBMChange}/>*/}
                     {this.state.showStats && <MapInfo/>}
                     <LocationTracker cursorColor={this.state.cursorColor} />

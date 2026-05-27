@@ -12,7 +12,7 @@
     font-family: monospace;
     font-size: 12px;
     z-index: 1000;
-    min-width: 280px;
+    width: 330px;
     pointer-events: none;
 }
 

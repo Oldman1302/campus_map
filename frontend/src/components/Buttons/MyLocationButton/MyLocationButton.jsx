@@ -1,26 +1,35 @@
 import React, { useState } from 'react';
-import { useMap } from 'react-leaflet';
 import { getUserLocation } from '../../../services/geolocation';
+import {useLocation} from "../../../context/LocationContext";
 import '../Button.css';
 import './MyLocationButton.css';
 
 export default function MyLocationButton({ onCenterChange }) {
-    const map = useMap();
     const [isLocating, setIsLocating] = useState(false);
+    const { userLocation, locationError } = useLocation();
 
-    const handleFindMyLocation = async () => {
+    const handleFindMyLocation = async (event) => {
+        // Prevent event bubbling to map
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Prevent double execution on mobile (touch + click)
+        if (isLocating) return;
+
         try {
             setIsLocating(true);
 
-            const position = await getUserLocation();
-            const { lat, lng } = position;
+            let lat, lng;
 
-
-            // Fly to user location with smooth animation
-            map.flyTo([lat, lng], map.getZoom(), {
-                duration: 1.5,
-                animate: true
-            });
+            if (userLocation && !locationError) {
+                lat = userLocation.lat;
+                lng = userLocation.lng;
+            } else {
+                // No cached location, need to get it (only happens first time)
+                const position = await getUserLocation();
+                lat = position.lat;
+                lng = position.lng;
+            }
 
             // Notify parent component to update center in state
             if (onCenterChange) {
@@ -40,10 +49,15 @@ export default function MyLocationButton({ onCenterChange }) {
             <button
                 className={`mylocation-button base-button ${isLocating ? 'loading' : ''}`}
                 onClick={handleFindMyLocation}
+                // onTouchEnd={handleFindMyLocation}
+                onTouchStart={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }}
                 title="Find my location"
                 disabled={isLocating}
             >
-                📍
+                {isLocating ? '⏳' : '📍'}
             </button>
         </div>
     );

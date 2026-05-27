@@ -12,15 +12,23 @@ This instruction explains how to set up and run the Campus Map backend project o
 
 1. Check if Node.js is installed:
 `node -v`
-If installed, you should see something like `v25.6.1`;
+If installed, you should see something like `v25.6.1`
+If Node.js is not installed:
+`sudo apt update
+sudo apt install nodejs`;
 2. Check if npm (Node Package Manager) is installed:
 `npm -v`
-If installed, you should see something like `10.7.0`;
+If installed, you should see something like `10.7.0`
+If npm is not installed:
+`sudo apt update
+sudo apt install npm`;
 3. If either node or npm is not installed then download LTS (Long Term Support) version Node.js from official website https://nodejs.org/ and restart terminal after all and repeat steps 1 and 2;
 4. Check if Git is installed:
 `git --version`
 If Git is installed, you should see something like `git version 2.45.1.windows.1`;
-5. If Git is not installed: https://git-scm.com/downloads and restart terminal after all and repeat step 4;
+5. If Git is not installed: 
+`sudo apt update
+sudo apt install git`;
 6. Clone the repository:
 `git clone https://github.com/Oldman1302/campus_map.git`;
 7. Open terminal in the project;
