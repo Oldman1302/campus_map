@@ -15,6 +15,7 @@ async function startServer(port) {
 
     console.log("Loading nodes...");
     const nodes = graph.getAllNodes();
+    console.log(`Loaded ${nodes.length} nodes`);
 
     console.log("Precomputing shortest paths (distance)...");
     const routesByDistance = await graph.dijkstraAll("distance");

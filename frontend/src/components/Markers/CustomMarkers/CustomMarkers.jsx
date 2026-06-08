@@ -43,17 +43,20 @@ export default function CustomMarkers({ markers=[] }) {
                     <img src="${imagePath}" alt="${type || 'marker'}" class="marker-image" />
             `;
 
-            markerHtml += `
-                            <div class="marker-tooltip">
-                                <p>${coordinates?.[0]}, ${coordinates?.[1]}</p>
-                            </div>
-                `;
-
             if (alwaysShow) {
-                markerHtml += `<div class="marker-label">${name}</div>`;
+                markerHtml += `
+                                <div class="marker-label">${name}</div>
+                                <div class="marker-tooltip">
+                              `;
+            } else {
+                markerHtml += `<div class="marker-tooltip"><p>${name}</p>`
             }
 
-            markerHtml += `</div>`;
+            markerHtml += `        <p>${coordinates?.[0]}, ${coordinates?.[1]}</p>
+                                </div>
+                            </div>
+                           `;
+
 
             return L.divIcon({
                 className: 'custom-marker',
