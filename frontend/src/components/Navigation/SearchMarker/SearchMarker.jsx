@@ -11,6 +11,7 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
     const [searchWidth, setSearchWidth] = useState('auto');
     const inputRef = useRef(null);
     const resultsRef = useRef(null);
+    const wrapperRef = useRef(null);
 
     // Calculate available width for search bar
     useEffect(() => {
@@ -34,6 +35,27 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
         window.addEventListener('resize', calculateWidth);
         return () => window.removeEventListener('resize', calculateWidth);
     }, []);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Check if click is outside the search wrapper
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setIsSearchOpen(false);
+            }
+        };
+
+        // Add event listener when dropdown is open
+        if (isSearchOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchstart', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [isSearchOpen]);
 
     // Prevent scroll events from reaching the map
     useEffect(() => {
@@ -103,8 +125,6 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
                 break;
             case 'Escape':
                 setIsSearchOpen(false);
-                setSearchInput('');
-                setSearchResults([]);
                 inputRef.current?.blur();
                 break;
             default:
@@ -124,7 +144,7 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
         });
 
         // Clear search
-        setSearchInput(marker.name);  // Clear search input
+        setSearchInput(marker.name);
         setSearchResults([]);
         setIsSearchOpen(false);
 
@@ -140,7 +160,7 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
 
     return (
         <div className="search-container">
-            <div className="search-wrapper" style={{width: searchWidth}}>
+            <div className="search-wrapper" style={{width: searchWidth}} ref={wrapperRef}>
                 <div className="search-input-wrapper">
                     <span className="search-icon">🔍</span>
                     <input

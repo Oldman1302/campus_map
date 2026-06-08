@@ -1,2 +1,2 @@
 // shows types for markers which should be fully represented on the map (image + photo)
-export const ALWAYS_VISIBLE_TYPES = ['educational_building', 'dormitory', 'cafe', 'default'];
+export const ALWAYS_VISIBLE_TYPES = ['educational_building', 'dormitory', 'cafe', 'post_office', 'supermarket', 'drink', 'default'];
