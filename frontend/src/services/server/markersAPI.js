@@ -1,11 +1,11 @@
-import {SERVER_URL} from "../constants/serverURL";
+import {SERVER_URL} from "../../constants/serverURL";
 
 export const fetchMarkers = async () => {
     try {
         const response = await fetch(`${SERVER_URL}/`);
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
