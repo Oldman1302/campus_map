@@ -2,14 +2,16 @@
 const STORAGE_KEYS = {
     BASEMAP: 'map_basemap',
     SHOW_STATS: 'map_show_stats',
-    CURSOR_COLOR: 'map_cursor_color'
+    CURSOR_COLOR: 'map_cursor_color',
+    ROUTE_COLOR: 'map_route_color'
 };
 
 // Default settings
 const DEFAULTS = {
     basemap: 'osm',
     showStats: false,
-    cursorColor: '#4f46e5'
+    cursorColor: '#4f46e5',
+    routeColor: '#4f46e5'
 };
 
 // Save basemap preference
@@ -71,5 +73,25 @@ export function loadCursorColor() {
     } catch (error) {
         console.error('Failed to load cursor color:', error);
         return DEFAULTS.cursorColor;
+    }
+}
+
+// Save route color preference
+export function saveRouteColor(color) {
+    try {
+        localStorage.setItem(STORAGE_KEYS.ROUTE_COLOR, color);
+    } catch (error) {
+        console.error('Failed to save route color:', error);
+    }
+}
+
+// Load route color preference
+export function loadRouteColor() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.ROUTE_COLOR);
+        return saved || DEFAULTS.routeColor;
+    } catch (error) {
+        console.error('Failed to load route color:', error);
+        return DEFAULTS.routeColor;
     }
 }

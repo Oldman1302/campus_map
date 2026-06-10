@@ -5,7 +5,7 @@ import {fetchRoute} from "../../../services/server/routeAPI";
 import {getUserLocation} from "../../../services/geolocation";
 import NavigationBuilder from "../NavigationBuilder/NavigationBuilder";
 
-export default function SearchMarker({ markers = [], isLoading = false }) {
+export default function SearchMarker({ markers = [], isLoading = false, routeColor }) {
     const map = useMap();
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -307,6 +307,7 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
                     markers={markers}
                     isActive={isNavigating}
                     onRouteComplete={handleNavigationEvent}
+                    routeColor={routeColor}
                 />
             )}
         </div>

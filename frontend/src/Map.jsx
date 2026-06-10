@@ -4,7 +4,7 @@ import './Map.css';
 import SettingsButton from "./components/Buttons/SettingsButton/SettingsButton";
 import MapInfo from "./components/MapInfo/MapInfo";
 import MapController from "./components/MapController"; // it's needed for centralization on our map
-import {saveBasemap, loadBasemap, saveShowStats, loadShowStats, saveCursorColor, loadCursorColor} from "./services/storage";
+import {saveBasemap, loadBasemap, saveShowStats, loadShowStats, saveCursorColor, loadCursorColor, saveRouteColor, loadRouteColor} from "./services/storage";
 import LocationTracker from "./components/Markers/LocationTracker/LocationTracker";
 import CustomMarkers from "./components/Markers/CustomMarkers/CustomMarkers";
 import {getUserLocation} from "./services/geolocation";
@@ -24,6 +24,7 @@ class MapComponent extends React.Component {
         maxZoom: 19,
         showStats: loadShowStats(),
         cursorColor: loadCursorColor(),
+        routeColor: loadRouteColor(),
         isLocationLoaded: false,  // Track if we've tried to get location
         markers: [],
         isLoadingMarkers: true
@@ -90,6 +91,18 @@ class MapComponent extends React.Component {
         }));
     }
 
+    onRouteColorChange = (color) => {
+        this.setState({ routeColor: color });
+        saveRouteColor(color);
+
+        // Dispatch event to notify NavigationBuilder
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'map_route_color',
+            newValue: color,
+            oldValue: this.state.routeColor
+        }));
+    }
+
     onCenterChange = (lat, lng) => {
         this.setState({
             centerLat: lat,
@@ -119,7 +132,7 @@ class MapComponent extends React.Component {
                               maxZoom={this.state.maxZoom}
                               className="map-container"
                 >
-                    <SearchMarker markers={this.state.markers} isLoading={this.state.isLoadingMarkers} />
+                    <SearchMarker markers={this.state.markers} isLoading={this.state.isLoadingMarkers} routeColor={this.state.routeColor} />
                     <TileLayer
                         // attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url={basemapDict[this.state.basemap]}
@@ -139,6 +152,8 @@ class MapComponent extends React.Component {
                         onToggleStats={this.onToggleStats}
                         cursorColor={this.state.cursorColor}
                         onCursorColorChange={this.onCursorColorChange}
+                        routeColor={this.state.routeColor}
+                        onRouteColorChange={this.onRouteColorChange}
                     />
 
                     <MyLocationButton onCenterChange={this.onCenterChange} />

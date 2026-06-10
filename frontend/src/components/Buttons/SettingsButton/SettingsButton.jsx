@@ -9,7 +9,9 @@ export default function SettingsButton({
                                            showStats,
                                            onToggleStats,
                                            cursorColor,
-                                           onCursorColorChange
+                                           onCursorColorChange,
+                                           routeColor,
+                                           onRouteColorChange
                                        }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -34,6 +36,8 @@ export default function SettingsButton({
                     onToggleStats={onToggleStats}
                     cursorColor={cursorColor}
                     onCursorColorChange={onCursorColorChange}
+                    routeColor={routeColor}
+                    onRouteColorChange={onRouteColorChange}
                 />
             )}
         </>

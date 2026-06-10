@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 import { getUserLocation } from "../../../services/geolocation";
 
-export default function NavigationBuilder({ routeData, markers, isActive, onRouteComplete }) {
+export default function NavigationBuilder({ routeData, markers, isActive, onRouteComplete, routeColor }) {
     const map = useMap();
     const navigationRef = useRef({
         polyline: null,
@@ -87,7 +87,7 @@ export default function NavigationBuilder({ routeData, markers, isActive, onRout
         if (!map || !coordinates.length) return;
 
         const polyline = L.polyline(coordinates, {
-            color: '#4f46e5',
+            color: routeColor || '#4f46e5',
             weight: 4,
             opacity: 0.8,
             lineJoin: 'round',
@@ -102,7 +102,7 @@ export default function NavigationBuilder({ routeData, markers, isActive, onRout
                 padding: [50, 50]
             });
         }
-    }, [map]);
+    }, [map, routeColor]);
 
     // Update route line based on current position
     const updateRouteLine = useCallback((userPos, originalPathCoordinates) => {
