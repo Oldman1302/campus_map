@@ -1,16 +1,22 @@
 import {useEffect, useState, useRef} from "react";
 import {useMap} from "react-leaflet";
 import "./SearchMarker.css"
+import {fetchRoute} from "../../../services/server/routeAPI";
+import {getUserLocation} from "../../../services/geolocation";
+import NavigationBuilder from "../NavigationBuilder/NavigationBuilder";
 
 export default function SearchMarker({ markers = [], isLoading = false }) {
     const map = useMap();
-    const [searchInput, setSearchInput] = useState('');  // Renamed from searchTerm
+    const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [searchWidth, setSearchWidth] = useState('auto');
     const inputRef = useRef(null);
     const resultsRef = useRef(null);
+    const wrapperRef = useRef(null);
+    const [navigationData, setNavigationData] = useState(null);
+    const [isNavigating, setIsNavigating] = useState(false);
 
     // Calculate available width for search bar
     useEffect(() => {
@@ -34,6 +40,27 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
         window.addEventListener('resize', calculateWidth);
         return () => window.removeEventListener('resize', calculateWidth);
     }, []);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Check if click is outside the search wrapper
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setIsSearchOpen(false);
+            }
+        };
+
+        // Add event listener when dropdown is open
+        if (isSearchOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchstart', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [isSearchOpen]);
 
     // Prevent scroll events from reaching the map
     useEffect(() => {
@@ -103,8 +130,6 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
                 break;
             case 'Escape':
                 setIsSearchOpen(false);
-                setSearchInput('');
-                setSearchResults([]);
                 inputRef.current?.blur();
                 break;
             default:
@@ -112,7 +137,6 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
         }
     };
 
-    // JUST A PLUG NOW. IN FUTURE IT SHOULD BE CONSTRUCTION ON PATH
     // Handle marker selection - fly to marker
     const handleSelectMarker = (marker) => {
         const [lat, lng] = marker.coordinates;
@@ -124,23 +148,81 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
         });
 
         // Clear search
-        setSearchInput(marker.name);  // Clear search input
+        setSearchInput(marker.name);
         setSearchResults([]);
         setIsSearchOpen(false);
 
         console.log('Selected marker:', marker.name, marker.type);
     };
 
-    // Placeholder for future navigation function
-    const handleBuildRoute = (marker) => {
-        // TODO: Navigation will be implemented later
-        console.log('TODO: Build route to:', marker.name, marker.coordinates);
-        alert(`🚧 Navigation to "${marker.name}" will be implemented soon!`);
+    // Handle navigation events from NavigationBuilder
+    const handleNavigationEvent = (result) => {
+        if (result.completed) {
+            alert(`🎉 Destination reached!\nDistance: ${result.distance}m\nTime: ${result.time}sec`);
+            setIsNavigating(false);
+            setNavigationData(null);
+        }
+
+        if (result.deviated) {
+            alert(`⚠️ Deviation detected: ${result.deviationDistance.toFixed(1)}m. Recalculating...`);
+            // Recalculate route from current position
+            handleRecalculateRoute(result.currentPosition);
+        }
+    };
+
+    // Recalculate route when user deviates
+    const handleRecalculateRoute = async (currentPosition) => {
+        if (!navigationData?.destination) return;
+
+        try {
+            const from = `${currentPosition[0].toFixed(6)}, ${currentPosition[1].toFixed(6)}`;
+            const route = await fetchRoute(from, navigationData.destination.name, "time");
+
+            setNavigationData({
+                path: route.path,
+                distance: route.distance,
+                time: route.time,
+                strategy: route.strategy,
+                destination: navigationData.destination
+            });
+
+            console.log('Route recalculated successfully');
+        } catch (error) {
+            console.error('Error recalculating route:', error);
+            alert(`Failed to recalculate route: ${error.message}`);
+        }
+    };
+
+    // Placeholder for navigation function
+    const handleBuildRoute = async (marker) => {
+        setIsSearchOpen(false);
+        try {
+            const from = await getUserLocation().then(fromObj => fromObj?.lat.toFixed(6) + ", " + fromObj?.lng.toFixed(6));
+            const route = await fetchRoute(from, marker.name, "time");
+
+            alert(`Route from ${from} to ${marker.name}:\n\n` +
+                `Strategy: ${route.strategy}\n` +
+                `Distance: ${route.distance} meters\n` +
+                `Time: ${route.time} seconds\n\n` +
+                `Path: ${route.path}`);
+
+            setNavigationData({
+                path: route.path,
+                distance: route.distance,
+                time: route.time,
+                strategy: route.strategy,
+                destination: marker
+            });
+
+            setIsNavigating(true);
+        } catch (error) {
+            alert(`Failed to fetch route: ${error.message}`);
+        }
     };
 
     return (
         <div className="search-container">
-            <div className="search-wrapper" style={{width: searchWidth}}>
+            <div className="search-wrapper" style={{width: searchWidth}} ref={wrapperRef}>
                 <div className="search-input-wrapper">
                     <span className="search-icon">🔍</span>
                     <input
@@ -219,6 +301,14 @@ export default function SearchMarker({ markers = [], isLoading = false }) {
                     </div>
                 )}
             </div>
+            {isNavigating && navigationData && (
+                <NavigationBuilder
+                    routeData={navigationData}
+                    markers={markers}
+                    isActive={isNavigating}
+                    onRouteComplete={handleNavigationEvent}
+                />
+            )}
         </div>
     );
 }

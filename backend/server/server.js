@@ -146,10 +146,24 @@ async function startServer(port) {
         const AVERAGE_WALKING_SPEED = 1.4; // m/s
 
         let totalTime = route.time || 0;
-        if (fromExtraDistance || toExtraDistance) {
-            totalTime += Math.round((fromExtraDistance + toExtraDistance) / AVERAGE_WALKING_SPEED);
-        }
 
+        // Build an array with all distances and values between nodes
+        let allDistances = [];
+        let allTimes = [];
+        if (fromExtraDistance) {
+            allDistances.push(fromExtraDistance);
+            const fromTime = Math.round(fromExtraDistance / AVERAGE_WALKING_SPEED);
+            allTimes.push(fromTime);
+            totalTime += fromTime;
+        }
+        allDistances.push(...route.distances);
+        allTimes.push(...route.times);
+        if (toExtraDistance) {
+            allDistances.push(toExtraDistance);
+            const toTime = Math.round(toExtraDistance / AVERAGE_WALKING_SPEED);
+            allTimes.push(toTime);
+            totalTime += toTime;
+        }
 
         // Build the full path
         let fullPath = route.path || [];
@@ -168,7 +182,9 @@ async function startServer(port) {
             strategy,
             distance: Math.round(totalDistance),
             time: totalTime,
-            path: fullPath
+            path: fullPath,
+            distances: allDistances,
+            times: allTimes
         });
     })
 
