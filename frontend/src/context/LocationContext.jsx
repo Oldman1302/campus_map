@@ -41,16 +41,10 @@ export const LocationProvider = ({ children }) => {
         };
     }, []);
 
-    // Function to manually refresh location
-    const refreshLocation = async () => {
-        // Implementation if needed
-    };
-
     const value = {
         userLocation,
         locationError,
-        isWatching,
-        refreshLocation
+        isWatching
     };
 
     return (

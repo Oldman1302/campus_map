@@ -1,1 +1,1 @@
-export const SERVER_URL = 'https://campusmap.duckdns.org:5002/';
+export const SERVER_URL = 'http://localhost:5001';

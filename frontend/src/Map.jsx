@@ -9,7 +9,7 @@ import LocationTracker from "./components/Markers/LocationTracker/LocationTracke
 import CustomMarkers from "./components/Markers/CustomMarkers/CustomMarkers";
 import {getUserLocation} from "./services/geolocation";
 import MyLocationButton from "./components/Buttons/MyLocationButton/MyLocationButton";
-import { fetchMarkers} from "./services/markersAPI";
+import { fetchMarkers} from "./services/server/markersAPI";
 import SearchMarker from "./components/Navigation/SearchMarker/SearchMarker";
 
 class MapComponent extends React.Component {
