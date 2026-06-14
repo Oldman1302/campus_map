@@ -145,7 +145,7 @@ class Graph {
      * @param {string|Node} start
      * @param {string} weightStrategy
      * @param {Map<string, Node>|null} customNodes - if it's needed to use different graph we use customNodes
-     * @returns {Promise<Object<string, {distance:number, path:string}>>}
+     * @returns {Promise<Object<string, {distance:number, path:string, distances:number[], times:number[]}>>}
      */
     async dijkstra(start, weightStrategy, customNodes = null) {
         const nodeMap = customNodes || this.nodes;
@@ -173,14 +173,18 @@ class Graph {
             distances.set(node, {
                 primary: Number.POSITIVE_INFINITY,
                 secondary: Number.POSITIVE_INFINITY,
-                path: ''
+                path: '',
+                distancesArray: [],
+                timesArray: []
             });
         }
 
         distances.set(startNode, {
             primary: 0.0,
             secondary: 0.0,
-            path: startNode.name
+            path: startNode.name,
+            distancesArray: [0],
+            timesArray: [0]
         });
 
         const secondWeightStrategy = weightStrategy === "distance" ? "time" : "distance";
@@ -206,6 +210,8 @@ class Graph {
             const currentPrimary = currentInfo.primary;
             const currentSecondary = currentInfo.secondary;
             const currentPath = currentInfo.path;
+            const currentDistancesArray = currentInfo.distancesArray;
+            const currentTimesArray = currentInfo.timesArray;
 
             // If current node is a building (not the start), skip expanding neighbors
             if (current.isBuilding && current !== startNode) {
@@ -225,11 +231,12 @@ class Graph {
 
                 const neighborInfo = distances.get(neighbor);
 
-                if (tentativePrimary < neighborInfo.primary) {
-                    distances.set(neighbor, {
+                if (tentativePrimary < neighborInfo.primary) {distances.set(neighbor, {
                         primary: tentativePrimary,
                         secondary: tentativeSecondary,
-                        path: currentPath + ' -> ' + neighbor.name
+                        path: currentPath + ' -> ' + neighbor.name,
+                        distancesArray: [...currentDistancesArray, edgeData.distance],
+                        timesArray: [...currentTimesArray, edgeData.time]
                     });
                 }
             }
@@ -247,7 +254,9 @@ class Graph {
             result[node.name] = {
                 [weightStrategy]: info.primary || 0,
                 [secondWeightStrategy]: info.secondary || 0,
-                path: info.path
+                path: info.path,
+                distances:info.distancesArray.slice(1),
+                times: info.timesArray.slice(1)
             };
         }
 
@@ -260,7 +269,7 @@ class Graph {
      * @param {string|Node} start - Start node name or Node instance
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
      * @param {Map<string, Node>|null} customNodes - Optional: custom node map (for Johnson’s extended graph)
-     * @returns {Promise<{ distancesPrimary: Object<string, number>, distancesSecondary: Object<string, number>, predecessors: Object<string, string|null> }>}
+     * @returns {Promise<{ distancesPrimary: Object<string, number>, distancesSecondary: Object<string, number>, predecessors: Object<string, string|null>,  distancesPrimaryArray:Object, distancesSecondaryArray:Object}>}
      */
     async #bellmanFordBase(start, weightStrategy, customNodes = null) {
         // Resolve start node
@@ -283,15 +292,21 @@ class Graph {
         const distancesPrimary = {};
         const distancesSecondary = {};
         const predecessors = {};
+        const distancesPrimaryArray = {};
+        const distancesSecondaryArray = {};
 
         for (const name of nodeNames) {
             distancesPrimary[name] = Number.POSITIVE_INFINITY;
             distancesSecondary[name] = Number.POSITIVE_INFINITY;
             predecessors[name] = null;
+            distancesPrimaryArray[name] = [];
+            distancesSecondaryArray[name] = [];
         }
 
         distancesPrimary[startNode.name] = 0;
         distancesSecondary[startNode.name] = 0;
+        distancesPrimaryArray[startNode.name] = [0];
+        distancesSecondaryArray[startNode.name] = [0];
 
         const useDistance = weightStrategy === 'distance';
 
@@ -312,13 +327,15 @@ class Graph {
                         distancesPrimary[vName] = distancesPrimary[uName] + primaryWeight;
                         distancesSecondary[vName] = distancesSecondary[uName] + secondaryWeight;
                         predecessors[vName] = uName;
+                        distancesPrimaryArray[vName] = [...distancesPrimaryArray[uName], edgeData.distance];
+                        distancesSecondaryArray[vName] = [...distancesSecondaryArray[uName], edgeData.time];
                         updated = true;
                     }
                 }
             }
             if (!updated) break; // optimization: stop early
         }
-        return { distancesPrimary, distancesSecondary, predecessors };
+        return { distancesPrimary, distancesSecondary, predecessors, distancesPrimaryArray, distancesSecondaryArray };
     }
 
     /**
@@ -328,13 +345,16 @@ class Graph {
      *
      * @param {string|Node} start
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
-     * @returns {Promise<Object<string, {distance:number, time: number, path:string}>>}
+     * @returns {Promise<Object<string, {distance:number, time: number, path:string, distances:number[], times:number[]}>>}
      */
     // In the future: you can add handler for negative edges
     async bellmanFord(start, weightStrategy) {
         const {
             distancesPrimary,
-            distancesSecondary, predecessors
+            distancesSecondary,
+            predecessors,
+            distancesPrimaryArray,
+            distancesSecondaryArray
         } = await this.#bellmanFordBase(start, weightStrategy);
 
         const useDistance = weightStrategy === 'distance';
@@ -362,7 +382,9 @@ class Graph {
                 time: useDistance
                     ? distancesSecondary[name]
                     : distancesPrimary[name],
-                path: buildPath(name).join(' -> ')
+                path: buildPath(name).join(' -> '),
+                distances: distancesPrimaryArray[name].slice(1),
+                times: distancesSecondaryArray[name].slice(1)
             };
         }
 
@@ -373,7 +395,7 @@ class Graph {
      * Compute the shortest paths from every node using Dijkstra.
      *
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
-     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
+     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string, distances: [], times: []} } }
      */
     async dijkstraAll(weightStrategy) {
         const results = {};
@@ -390,7 +412,7 @@ class Graph {
      * Compute the shortest paths from every node using Bellman-Ford.
      *
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
-     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
+     * Returns: { fromNodeName: { toNodeName: {distance: number, time: number, path: string, distances: [], times: []} } }
      */
     async bellmanFordAll(weightStrategy) {
         const results = {};
@@ -407,7 +429,7 @@ class Graph {
      * Floyd–Warshall algorithm for all-pairs shortest paths.
      *
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
-     * Returns object { fromNodeName: { toNodeName: {distance: number, time: number, path: string} } }
+     * Returns object { fromNodeName: { toNodeName: {distance: number, time: number, path: string, distances: [], times: []} } }
      */
     async floydWarshall(weightStrategy) {
         const nodeNames = Array.from(this.nodes.keys());
@@ -416,19 +438,27 @@ class Graph {
         const primary = {};
         const secondary = {};
         const nextHop = {};
+        const primaryArray = {};
+        const secondaryArray = {};
 
         for (const nodeI of nodeNames) {
             primary[nodeI] = {};
             secondary[nodeI] = {};
             nextHop[nodeI] = {};
+            primaryArray[nodeI] = {};
+            secondaryArray[nodeI] = {};
             for (const nodeJ of nodeNames) {
                 if (nodeI === nodeJ) {
                     primary[nodeI][nodeJ] = 0;
                     secondary[nodeI][nodeJ] = 0;
+                    primaryArray[nodeI][nodeJ] = [0];
+                    secondaryArray[nodeI][nodeJ] = [0];
                 }
                 else {
                     primary[nodeI][nodeJ] = Number.POSITIVE_INFINITY;
                     secondary[nodeI][nodeJ] = Number.POSITIVE_INFINITY;
+                    primaryArray[nodeI][nodeJ] = [];
+                    secondaryArray[nodeI][nodeJ] = [];
                 }
                 nextHop[nodeI][nodeJ] = null;
             }
@@ -442,6 +472,8 @@ class Graph {
                     ? edgeData.time
                     : edgeData.distance;
                 nextHop[name][neighbor.name] = neighbor.name;
+                primaryArray[name][neighbor.name] = [edgeData.distance];
+                secondaryArray[name][neighbor.name] = [edgeData.time];
             }
         }
 
@@ -457,6 +489,15 @@ class Graph {
                         primary[nodeI][nodeJ] = primary[nodeI][nodeK] + primary[nodeK][nodeJ];
                         secondary[nodeI][nodeJ] = secondary[nodeI][nodeK] + secondary[nodeK][nodeJ];
                         nextHop[nodeI][nodeJ] = nextHop[nodeI][nodeK];
+
+                        primaryArray[nodeI][nodeJ] = [
+                            ...primaryArray[nodeI][nodeK],
+                            ...primaryArray[nodeK][nodeJ]
+                        ];
+                        secondaryArray[nodeI][nodeJ] = [
+                            ...secondaryArray[nodeI][nodeK],
+                            ...secondaryArray[nodeK][nodeJ]
+                        ];
                     }
                 }
             }
@@ -488,7 +529,9 @@ class Graph {
                     time: weightStrategy === "distance"
                         ? secondary[nodeI][nodeJ]
                         : primary[nodeI][nodeJ],
-                    path: pathStr
+                    path: pathStr,
+                    distances: primaryArray[nodeI][nodeJ],
+                    times: secondaryArray[nodeI][nodeJ]
                 }
             }
         }
@@ -501,7 +544,7 @@ class Graph {
      * Efficient for sparse graphs and supports negative edge weights
      *
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
-     * @returns {Promise<Object<string, Object<string, {distance:number, path:string}>>>}
+     * @returns {Promise<Object<string, Object<string, {distance:number, path:string, distances:number[], times:number[]}>>>}
      */
     async johnson(weightStrategy) {
         // Add temporary node S connected to all nodes with 0-weight edges
@@ -562,7 +605,7 @@ class Graph {
             const dijkstraResult = await this.dijkstra(uName, weightStrategy, reweighted);
 
             result[uName] = {};
-            for (const [vName, { distance, time, path }] of Object.entries(dijkstraResult)) {
+            for (const [vName, { distance, time, path, distances, times }] of Object.entries(dijkstraResult)) {
                 const correctedPrimary = (weightStrategy === 'distance'
                         ? distance
                         : time)
@@ -575,7 +618,9 @@ class Graph {
                     time: weightStrategy === 'distance'
                         ? time
                         : correctedPrimary,
-                    path
+                    path,
+                    distances: distances,
+                    times: times
                 };
             }
         }
@@ -588,7 +633,7 @@ class Graph {
      * @param {string|Node} start
      * @param {string|Node} goal
      * @param {string} weightStrategy - the strategy of "the best path" can be either by distance or by time
-     * @returns {{distance: number, time: number, path: string}}
+     * @returns {{distance: number, time: number, path: string, distances:number[], times:number[]}}
      */
     aStar(start, goal,weightStrategy) {
         // Resolve start to Node instance
@@ -640,6 +685,10 @@ class Graph {
         const secondaryScore = new Map();
         // path tracking
         const pathMap = new Map();
+        // stores distances between nodes for path
+        const distancesPrimaryArray = new Map();
+        // stores time values between nodes for path
+        const distancesSecondaryArray = new Map();
 
         // Initialization
         for (const node of this.nodes.values()) {
@@ -647,12 +696,16 @@ class Graph {
             fScore.set(node, Infinity);
             secondaryScore.set(node, Infinity);
             pathMap.set(node, "");
+            distancesPrimaryArray.set(node, []);
+            distancesSecondaryArray.set(node, []);
         }
 
         gScore.set(startNode, 0);
         secondaryScore.set(startNode, 0);
         fScore.set(startNode, heuristic(startNode));
         pathMap.set(startNode, startNode.name);
+        distancesPrimaryArray.set(startNode, [0]);
+        distancesSecondaryArray.set(startNode, [0]);
 
         while (openSet.size > 0) {
             // Find node in openSet with lowest fScore
@@ -676,7 +729,9 @@ class Graph {
                     time: weightStrategy === 'time'
                     ? gScore.get(current)
                     : secondaryScore.get(current),
-                    path: pathMap.get(current)
+                    path: pathMap.get(current),
+                    distances: distancesPrimaryArray.get(current).slice(1),
+                    times: distancesSecondaryArray.get(current).slice(1),
                 };
             }
 
@@ -708,6 +763,9 @@ class Graph {
                         pathMap.get(current) + " -> " + neighbor.name
                     );
 
+                    distancesPrimaryArray.set(neighbor, [...distancesPrimaryArray.get(current), edgeData.distance]);
+                    distancesSecondaryArray.set(neighbor, [...distancesSecondaryArray.get(current), edgeData.time]);
+
                     openSet.add(neighbor);
                 }
             }
@@ -717,7 +775,9 @@ class Graph {
         return {
             distance: Infinity,
             time: Infinity,
-            path: ""
+            path: "",
+            distances: [],
+            times: []
         };
     }
 

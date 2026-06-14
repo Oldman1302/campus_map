@@ -5,3 +5,10 @@
     right: 20px;
     z-index: 1000;
 }
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .settings-button-container {
+        right: 15px;
+    }
+}

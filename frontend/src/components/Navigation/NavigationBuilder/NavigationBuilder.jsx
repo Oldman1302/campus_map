@@ -3,13 +3,26 @@ import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 import { getUserLocation } from "../../../services/geolocation";
 
-export default function NavigationBuilder({ routeData, markers, isActive, onRouteComplete, routeColor }) {
+export default function NavigationBuilder({
+                                              routeData,
+                                              markers,
+                                              isActive,
+                                              onRouteComplete,
+                                              routeColor,
+                                              isRouteFromFixedPoint,
+                                              onNavigationUpdate
+                                          }) {
     const map = useMap();
     const navigationRef = useRef({
         polyline: null,
         interval: null,
         currentPosition: null,
-        originalPathCoordinates: null
+        originalPathCoordinates: null,
+        pathNodes: null,
+        distances: null,
+        times: null,
+        totalDistance: 0,
+        totalTime: 0
     });
 
     // Calculate distance between two points
@@ -48,6 +61,43 @@ export default function NavigationBuilder({ routeData, markers, isActive, onRout
         const { minDistance } = findClosestPointOnRoute(userPos, routeCoordinates);
         return minDistance;
     }, [findClosestPointOnRoute]);
+
+    // Calculate remaining time and distance based on current position
+    const calculateRemainingStats = useCallback((userPos, pathNodes, distances, times) => {
+        if (!pathNodes || !distances || !times || distances.length === 0) {
+            return {
+                leftTime: 0,
+                leftDistance: 0
+            };
+        }
+
+        // Convert path nodes to coordinates
+        const routeCoordinates = pathNodes.map(node => {
+            if (node.includes(',') && !isNaN(parseFloat(node.split(',')[0]))) {
+                const [lat, lng] = node.split(',').map(coordinate => parseFloat(coordinate.trim()));
+                return [lat, lng];
+            } else {
+                const marker = markers.find(m => m.name === node);
+                if (marker && marker.coordinates) {
+                    return [marker.coordinates[0], marker.coordinates[1]];
+                }
+                return null;
+            }
+        }).filter(coordinate => coordinate !== null);
+
+        const { closestIndex } = findClosestPointOnRoute(userPos, routeCoordinates);
+
+        let leftDistance = 0;
+        let leftTime = 0;
+
+        // Sum distances and times from closestIndex to end
+        for (let i = closestIndex; i < distances.length; i++) {
+            leftDistance += distances[i];
+            leftTime += times[i];
+        }
+
+        return {leftDistance, leftTime};
+    }, [findClosestPointOnRoute, markers]);
 
     const getRemainingPath = useCallback((userPos, originalPathCoordinates) => {
         if (!originalPathCoordinates || originalPathCoordinates.length === 0) return [];
@@ -127,8 +177,30 @@ export default function NavigationBuilder({ routeData, markers, isActive, onRout
         // Store original path for updates
         navigationRef.current.originalPathCoordinates = coordinates;
 
+        // NEW: Store path data for stats calculation
+        const pathNodes = routeData.path.split(' -> ');
+        navigationRef.current.pathNodes = pathNodes;
+        navigationRef.current.distances = routeData.distances || [];
+        navigationRef.current.times = routeData.times || [];
+        navigationRef.current.totalDistance = routeData.distance || 0;
+        navigationRef.current.totalTime = routeData.time || 0;
+
+        // Send initial stats to parent
+        if (onNavigationUpdate) {
+            onNavigationUpdate({
+                leftDistance: routeData.distance || 0,
+                leftTime: routeData.time || 0
+            });
+        }
+
         // Check position every 5 seconds
         navigationRef.current.interval = setInterval(async () => {
+            // if navigation is no longer active, stop tracking
+            if (!isActive) {
+                clearNavigation();
+                return;
+            }
+
             try {
                 const userPos = await getUserLocation();
                 const userLatLng = [userPos.lat, userPos.lng];
@@ -148,48 +220,62 @@ export default function NavigationBuilder({ routeData, markers, isActive, onRout
 
                 navigationRef.current.currentPosition = userLatLng;
 
-                // Update route line to show remaining path
-                updateRouteLine(userLatLng, navigationRef.current.originalPathCoordinates);
+                // Update route line to show remaining path and check the deviation only if route is from current location
+                if (!isRouteFromFixedPoint) {
+                    updateRouteLine(userLatLng, navigationRef.current.originalPathCoordinates);
 
-                // Check if user deviated from route
-                const minDistance = checkDeviation(userLatLng, coordinates);
-                if (minDistance > 30) {
-                    // Deviation > 30 meters
-                    console.log(`Deviation detected: ${minDistance.toFixed(1)}m > 30m`);
-                    if (onRouteComplete) {
-                        onRouteComplete({
-                            deviated: true,
-                            deviationDistance: minDistance,
-                            currentPosition: userLatLng
-                        });
-                    }
-                } else {
-                    // Check if reached destination
-                    const destinationPoint = coordinates[coordinates.length - 1];
-                    const distanceToDestination = calculateDistance(
-                        userLatLng[0], userLatLng[1],
-                        destinationPoint[0], destinationPoint[1]
-                    );
-
-                    if (distanceToDestination < 10) {
-                        // Arrived at destination
-                        console.log('Destination reached!');
+                    const minDistance = checkDeviation(userLatLng, coordinates);
+                    if (minDistance > 30) {
+                        // Deviation > 30 meters
+                        console.log(`Deviation detected: ${minDistance.toFixed(1)}m > 30m`);
                         if (onRouteComplete) {
                             onRouteComplete({
-                                completed: true,
-                                distance: routeData.distance,
-                                time: routeData.time
+                                deviated: true,
+                                deviationDistance: minDistance,
+                                currentPosition: userLatLng
                             });
                         }
-                        clearNavigation();
+                    } else {
+                        // Check if reached destination
+                        const destinationPoint = coordinates[coordinates.length - 1];
+                        const distanceToDestination = calculateDistance(
+                            userLatLng[0], userLatLng[1],
+                            destinationPoint[0], destinationPoint[1]
+                        );
+
+                        if (distanceToDestination < 10) {
+                            // Arrived at destination
+                            console.log('Destination reached!');
+                            if (onRouteComplete) {
+                                onRouteComplete({
+                                    completed: true,
+                                    distance: routeData.distance,
+                                    time: routeData.time
+                                });
+                            }
+                            clearNavigation();
+                        }
                     }
                 }
+                const {leftDistance, leftTime} = calculateRemainingStats(
+                    userLatLng,
+                    navigationRef.current.pathNodes,
+                    navigationRef.current.distances,
+                    navigationRef.current.times
+                );
 
+                // Send updates to parent
+                if (onNavigationUpdate) {
+                    onNavigationUpdate({
+                        leftDistance: leftDistance,
+                        leftTime: leftTime
+                    });
+                }
             } catch (error) {
                 console.error('Error tracking position:', error);
             }
         }, 5000);
-    }, [checkDeviation, calculateDistance, clearNavigation, onRouteComplete, updateRouteLine]);
+    }, [checkDeviation, calculateDistance, clearNavigation, onRouteComplete, updateRouteLine, isActive, isRouteFromFixedPoint, calculateRemainingStats, onNavigationUpdate]);
 
     // Parse route path and convert to coordinates
     useEffect(() => {

@@ -11,6 +11,9 @@ import {getUserLocation} from "./services/geolocation";
 import MyLocationButton from "./components/Buttons/MyLocationButton/MyLocationButton";
 import { fetchMarkers} from "./services/server/markersAPI";
 import SearchMarker from "./components/Navigation/SearchMarker/SearchMarker";
+import StopNavigationButton from "./components/Buttons/StopNavigationButton/StopNavigationButton";
+import {fetchRoute} from "./services/server/routeAPI";
+import {parseRouteParams, updateUrlParams, clearUrlParams} from "./services/urlParams";
 
 class MapComponent extends React.Component {
     state = {
@@ -21,20 +24,90 @@ class MapComponent extends React.Component {
         southEast: [22.35961, 113.546551],
         basemap: loadBasemap(),
         minZoom: 14,
-        maxZoom: 19,
+        maxZoom: 18,
         showStats: loadShowStats(),
         cursorColor: loadCursorColor(),
         routeColor: loadRouteColor(),
         isLocationLoaded: false,  // Track if we've tried to get location
         markers: [],
-        isLoadingMarkers: true
+        isLoadingMarkers: true,
+        isNavigating: false,
+        navigationDataToMarker: null,
+        selectedStartPoint: null,
+        isInitialRouteLoading: true, // For initial navigation (by ref)
     };
 
     // Get user location and markers once when component mounts
-    componentDidMount() {
-        this.getUserLocationOnce();
-        this.loadAllMarkers();
+    async componentDidMount() {
+        await this.getUserLocationOnce();
+        await this.loadAllMarkers();
+        await this.checkRouteParams();
     }
+
+    checkRouteParams = async () => {
+        const params = parseRouteParams();
+        if (!params.to) {
+            // No destination parameter, just show the map
+            this.setState({ isInitialRouteLoading: false });
+            return;
+        }
+
+        // Wait for markers to load
+        if (this.state.isLoadingMarkers) {
+            // Wait for markers to load
+            const checkMarkers = () => {
+                if (!this.state.isLoadingMarkers) {
+                    this.processRouteParams(params);
+                } else {
+                    setTimeout(checkMarkers, 100);
+                }
+            };
+            setTimeout(checkMarkers, 100);
+        } else {
+            await this.processRouteParams(params);
+        }
+    }
+
+    // Process route parameters
+    processRouteParams = async (params) => {
+        // Prevent multiple calls
+        if (this.state.isNavigating) {
+            return;
+        }
+
+        const { from, to, strategy } = params;
+        const markers = this.state.markers;
+
+        try {
+            // Find destination marker by name
+            const toMarker = markers.find(marker => marker.name === to);
+            if (!toMarker) {
+                console.warn(`Destination marker not found: ${to}`);
+                this.setState({ isInitialRouteLoading: false });
+                return;
+            }
+
+            // Find start marker if provided
+            let fromMarker = null;
+            if (from) {
+                fromMarker = markers.find(m => m.name === from);
+                if (!fromMarker) {
+                    console.warn(`Start marker not found: ${from}, using current location`);
+                }
+            }
+            // Build route
+            await this.startNavigationToMarker(fromMarker, toMarker, strategy);
+
+            // Update URL with parameters
+            updateUrlParams({ from, to, strategy });
+
+        } catch (error) {
+            console.error('Error processing route params:', error);
+        } finally {
+            this.setState({isInitialRouteLoading: false});
+        }
+    };
+
 
     getUserLocationOnce = async () => {
         try {
@@ -63,7 +136,7 @@ class MapComponent extends React.Component {
         } catch (error) {
             console.error('Error loading markers:', error);
             this.setState({
-                allMarkers: [],
+                markers: [],
                 isLoadingMarkers: false
             });
         }
@@ -110,6 +183,80 @@ class MapComponent extends React.Component {
         });
     }
 
+    // Navigation state management
+    onNavigationStart = () => {
+        this.setState({ isNavigating: true });
+    }
+
+    onNavigationStop = () => {
+        this.setState({
+            isNavigating: false,
+            navigationDataToMarker: null
+        });
+        clearUrlParams()
+    }
+
+    // start navigation if user clicked on Marker (only if the navigation is not active)
+    handleMarkerClick = async (marker) => {
+        // If we already have navigation mode, the click on marker is not active
+        if (this.state.isNavigating) return;
+        await this.startNavigationToMarker(this.state.selectedStartPoint, marker);
+    }
+
+    // Handle selected start point from SearchMarker
+    onStartPointSelect = (marker) => {
+        this.setState({ selectedStartPoint: marker });
+    }
+
+    // Universal function to build route to a destination marker
+    // If startMarker is provided, route starts from that marker
+    // Otherwise, route starts from user's current location
+    startNavigationToMarker = async (fromMarker = null, toMarker, strategy = 'time') => {
+        try {
+            let from;
+
+            if (fromMarker) {
+                from = `${fromMarker.coordinates[0].toFixed(6)}, ${fromMarker.coordinates[1].toFixed(6)}`;
+            } else {
+                from = await getUserLocation().then(fromObj => fromObj?.lat.toFixed(6) + ", " + fromObj?.lng.toFixed(6));
+            }
+
+            const route = await fetchRoute(from, toMarker.name, strategy);
+
+            alert(`Route from ${from} to ${toMarker.name}:\n\n` +
+                `Strategy: ${route.strategy}\n` +
+                `Distance: ${route.distance} meters\n` +
+                `Time: ${route.time} seconds\n\n` +
+                `Path: ${route.path}\n\n`);
+
+            // Update URL with route parameters
+            updateUrlParams({
+                from: fromMarker?.name,
+                to: toMarker.name,
+                strategy: strategy
+            });
+
+            // Load data for navigation
+            this.setState({
+                navigationDataToMarker: {
+                    path: route.path,
+                    distance: route.distance,
+                    time: route.time,
+                    strategy: route.strategy,
+                    destination: toMarker,
+                    startPoint: fromMarker,
+                    distances: route.distances || [],
+                    times: route.times || []
+                }
+            });
+
+            this.onNavigationStart();
+
+        } catch (error) {
+            alert(`Failed to fetch route: ${error.message}`);
+        }
+    }
+
     render() {
         const center = [this.state.centerLat, this.state.centerLng];
         const bounds = [this.state.northWest, this.state.southEast];
@@ -132,18 +279,30 @@ class MapComponent extends React.Component {
                               maxZoom={this.state.maxZoom}
                               className="map-container"
                 >
-                    <SearchMarker markers={this.state.markers} isLoading={this.state.isLoadingMarkers} routeColor={this.state.routeColor} />
+                    <SearchMarker
+                        markers={this.state.markers}
+                        isLoading={this.state.isLoadingMarkers}
+                        routeColor={this.state.routeColor}
+                        isNavigating={this.state.isNavigating}
+                        onNavigationStart={this.onNavigationStart}
+                        onNavigationStop={this.onNavigationStop}
+                        navigationDataToMarker={this.state.navigationDataToMarker}
+                        buildRoute={this.startNavigationToMarker}
+                        selectedStartPoint={this.state.selectedStartPoint}
+                        onStartPointSelect={this.onStartPointSelect}
+                    />
                     <TileLayer
                         // attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url={basemapDict[this.state.basemap]}
                         // url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     />
-                    <CustomMarkers markers={this.state.markers} />
-                    {/*<Basemap basemap={this.state.basemap} onChange={this.onBMChange}/>*/}
+                    <CustomMarkers
+                        markers={this.state.markers}
+                        onMarkerClick={this.handleMarkerClick}
+                    />
                     {this.state.showStats && <MapInfo/>}
                     <LocationTracker cursorColor={this.state.cursorColor} />
-                    <MapController center={center} zoom={this.state.zoom}
-                    />
+                    <MapController center={center} zoom={this.state.zoom}/>
 
                     <SettingsButton
                         basemap={this.state.basemap}
@@ -157,6 +316,10 @@ class MapComponent extends React.Component {
                     />
 
                     <MyLocationButton onCenterChange={this.onCenterChange} />
+
+                    {this.state.isNavigating && (
+                        <StopNavigationButton onStop={this.onNavigationStop} />
+                    )}
 
                 </MapContainer>
             </>

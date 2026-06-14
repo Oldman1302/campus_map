@@ -35,6 +35,12 @@ async function loadCampusGraph() {
     await campus.addNode('Dormitory №20 Kitchen', [22.364996, 113.539814], null, true, 'kitchen');
     await campus.addNode('Dormitory №20 Public Toilet', [22.365094, 113.540198], null, true, 'toilet');
 
+    await campus.addNode('Canteen № 3', [22.363506, 113.539146], null, true, 'cafe');
+    await campus.addNode('Canteen № 3 Entrance 1', [22.363501, 113.539378], null, true, 'gate'); // point 374
+    await campus.addNode('Canteen № 3 Entrance 2', [22.363406, 113.539271], null, true, 'gate'); // point 378
+    await campus.addNode('Canteen № 3 Entrance 3', [22.363576, 113.539361], null, true, 'gate'); // point 375
+    await campus.addNode('Canteen № 3 Entrance 4', [22.363404, 113.539189], null, true, 'gate'); // point 375
+
     await campus.addNode('Muslim cafe', [22.365433, 113.540379], null, true, 'cafe');
     await campus.addNode('满忆糖水', [22.365284, 113.540367], null, true, 'drink'); // point 251
     await campus.addNode('YOUNG ONCE', [22.365284, 113.540386], null, true, 'cafe'); // point 252
@@ -178,6 +184,13 @@ async function loadCampusGraph() {
     await campus.addNode('22.363822, 113.539595', [22.363822, 113.539595], null, false); // point 366
     await campus.addNode('22.363768, 113.539566', [22.363768, 113.539566], null, false); // point 367
     await campus.addNode('22.363471, 113.539533', [22.363471, 113.539533], null, false); // point 368
+    await campus.addNode('22.363235, 113.539528', [22.363235, 113.539528], null, false); // point 380
+
+    await campus.addNode('22.363497, 113.539378', [22.363497, 113.539378], null, false); // point 373
+    await campus.addNode('22.363409, 113.539354', [22.363409, 113.539354], null, false); // point 376
+    await campus.addNode('22.363369, 113.539271', [22.363369, 113.539271], null, false); // point 377
+
+    await campus.addNode('22.363231, 113.539298', [22.363231, 113.539298], null, false); // point 379
 
 
     await campus.addNode('22.365445, 113.539863', [22.365445, 113.539863], null, false);
@@ -397,7 +410,23 @@ async function loadCampusGraph() {
     await campus.addEdge('22.363822, 113.539595', '22.363943, 113.539571', 13, 9);
     await campus.addEdge('22.363822, 113.539595', '22.363768, 113.539566', 8, 5);
     await campus.addEdge('22.363471, 113.539533', '22.363768, 113.539566', 30, 18);
+    await campus.addEdge('22.363471, 113.539533', '22.363235, 113.539528', 24, 16);
+    await campus.addEdge('22.363409, 113.539354', '22.363235, 113.539528', 24, 17);
 
+    await campus.addEdge('22.363471, 113.539533', '22.363497, 113.539378', 17, 10);
+    await campus.addEdge('Canteen № 3', '22.363497, 113.539378', 2, 1);
+    await campus.addEdge('Canteen № 3 Entrance 1', '22.363497, 113.539378', 2, 1);
+    await campus.addEdge('Canteen № 3', '22.363497, 113.539378', 10, 6);
+    await campus.addEdge('Canteen № 3 Entrance 3', '22.363497, 113.539378', 10, 6);
+    await campus.addEdge('22.363409, 113.539354', '22.363497, 113.539378', 10, 7);
+    await campus.addEdge('22.363409, 113.539354', '22.363369, 113.539271', 8, 6);
+    await campus.addEdge('Canteen № 3', '22.363369, 113.539271', 1, 1);
+    await campus.addEdge('Canteen № 3 Entrance 2', '22.363369, 113.539271', 1, 1);
+    await campus.addEdge('Canteen № 3', '22.363369, 113.539271', 10, 7);
+    await campus.addEdge('Canteen № 3 Entrance 4', '22.363369, 113.539271', 10, 7);
+
+    await campus.addEdge('22.363231, 113.539298', '22.363369, 113.539271', 14, 9);
+    await campus.addEdge('22.363231, 113.539298', '22.363235, 113.539528', 25, 15);
 
     await campus.addEdge('Dormitory №20 Entrance 1', '22.365189, 113.539670', 14, 10);
     await campus.addEdge('Dormitory №19 Entrance 1', '22.365189, 113.539670', 18, 3);

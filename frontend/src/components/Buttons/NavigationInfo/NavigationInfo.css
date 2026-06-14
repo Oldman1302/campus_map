@@ -1,0 +1,51 @@
+/* Navigation info container */
+.navigation-info-container {
+    position: fixed;
+    top: 200px; /* Below StopNavigationButton */
+    right: 20px;
+    z-index: 1000;
+}
+
+.navigation-info {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 8px 12px;
+    min-width: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.3s ease;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.info-value {
+    color: #374151;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .navigation-info-container {
+        top: 170px;
+        right: 15px;
+    }
+
+    .navigation-info {
+        padding: 6px 10px;
+        min-width: 20px;
+    }
+
+    .info-item {
+        font-size: 12px;
+    }
+}

@@ -5,3 +5,12 @@
     right: 20px;
     z-index: 1000;
 }
+
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .mylocation-button-container {
+        top: 70px;  /* Adjusted for mobile */
+        right: 15px;
+    }
+}

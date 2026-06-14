@@ -5,7 +5,7 @@ import { BUILDING_LOGOS } from "../../../constants/buildingLogos";
 import './СustomMarkers.css';
 import {ALWAYS_VISIBLE_TYPES} from "../../../constants/visibleTypes";
 
-export default function CustomMarkers({ markers=[] }) {
+export default function CustomMarkers({ markers=[], onMarkerClick }) {
     const map = useMap();
     const markersRef = useRef([]);
 
@@ -81,7 +81,16 @@ export default function CustomMarkers({ markers=[] }) {
             const position = [lat, lng];
             const icon = createMarkerIcon(point.type, point.name, point.coordinates);
 
-            return L.marker(position, { icon }).addTo(map);
+            const marker = L.marker(position, { icon }).addTo(map);
+
+            // Add click handler
+            if (onMarkerClick) {
+                marker.on('contextmenu', () => {
+                    onMarkerClick(point);
+                });
+            }
+
+            return marker;
         });
 
         // Cleanup on unmount
@@ -92,7 +101,7 @@ export default function CustomMarkers({ markers=[] }) {
                 }
             });
         };
-    }, [map, markers]);
+    }, [map, markers, onMarkerClick]);
 
     return null;
 }
