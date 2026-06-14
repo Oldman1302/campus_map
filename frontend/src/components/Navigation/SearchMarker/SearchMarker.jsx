@@ -2,10 +2,20 @@ import {useEffect, useState, useRef} from "react";
 import {useMap} from "react-leaflet";
 import "./SearchMarker.css"
 import {fetchRoute} from "../../../services/server/routeAPI";
-import {getUserLocation} from "../../../services/geolocation";
 import NavigationBuilder from "../NavigationBuilder/NavigationBuilder";
 
-export default function SearchMarker({ markers = [], isLoading = false, routeColor }) {
+export default function SearchMarker({
+                                         markers = [],
+                                         isLoading = false,
+                                         routeColor,
+                                         isNavigating = false,
+                                         onNavigationStart,
+                                         onNavigationStop,
+                                         navigationDataToMarker = null,
+                                         buildRoute,
+                                         selectedStartPoint = null,
+                                         onStartPointSelect
+}) {
     const map = useMap();
     const [searchInput, setSearchInput] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -16,7 +26,6 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
     const resultsRef = useRef(null);
     const wrapperRef = useRef(null);
     const [navigationData, setNavigationData] = useState(null);
-    const [isNavigating, setIsNavigating] = useState(false);
 
     // Calculate available width for search bar
     useEffect(() => {
@@ -105,6 +114,13 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
         setSelectedIndex(-1);
     }, [searchInput, markers]);
 
+    // Clears navigationData, when navigation is stopped from outside (button Stop)
+    useEffect(() => {
+        if (!isNavigating && navigationData) {
+            setNavigationData(null);
+        }
+    }, [isNavigating, navigationData]);
+
     // Handle keyboard navigation
     const handleKeyDown = (e) => {
         if (!searchResults.length) return;
@@ -155,18 +171,36 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
         console.log('Selected marker:', marker.name, marker.type);
     };
 
+    // Handle start point selection
+    const handleSelectStartPoint = (e, marker) => {
+        e.stopPropagation();
+
+        // If the same marker is selected, deselect it
+        if (selectedStartPoint?.name === marker.name) {
+            if (onStartPointSelect) {
+                onStartPointSelect(null);
+            }
+        } else {
+            if (onStartPointSelect) {
+                onStartPointSelect(marker);
+            }
+        }
+    };
+
     // Handle navigation events from NavigationBuilder
-    const handleNavigationEvent = (result) => {
+    const handleNavigationEvent = async (result) => {
         if (result.completed) {
             alert(`🎉 Destination reached!\nDistance: ${result.distance}m\nTime: ${result.time}sec`);
-            setIsNavigating(false);
             setNavigationData(null);
+            if (onNavigationStop) {
+                onNavigationStop();
+            }
         }
 
         if (result.deviated) {
-            alert(`⚠️ Deviation detected: ${result.deviationDistance.toFixed(1)}m. Recalculating...`);
+            alert(`Deviation detected: ${result.deviationDistance.toFixed(1)}m. Recalculating...`);
             // Recalculate route from current position
-            handleRecalculateRoute(result.currentPosition);
+            await handleRecalculateRoute(result.currentPosition);
         }
     };
 
@@ -196,33 +230,23 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
     // Placeholder for navigation function
     const handleBuildRoute = async (marker) => {
         setIsSearchOpen(false);
-        try {
-            const from = await getUserLocation().then(fromObj => fromObj?.lat.toFixed(6) + ", " + fromObj?.lng.toFixed(6));
-            const route = await fetchRoute(from, marker.name, "time");
-
-            alert(`Route from ${from} to ${marker.name}:\n\n` +
-                `Strategy: ${route.strategy}\n` +
-                `Distance: ${route.distance} meters\n` +
-                `Time: ${route.time} seconds\n\n` +
-                `Path: ${route.path}`);
-
-            setNavigationData({
-                path: route.path,
-                distance: route.distance,
-                time: route.time,
-                strategy: route.strategy,
-                destination: marker
-            });
-
-            setIsNavigating(true);
-        } catch (error) {
-            alert(`Failed to fetch route: ${error.message}`);
+        if (buildRoute) {
+            buildRoute(selectedStartPoint, marker);
         }
     };
 
+    useEffect(() => {
+        if (navigationDataToMarker) {
+            setNavigationData(navigationDataToMarker);
+            if (onNavigationStart) {
+                onNavigationStart();
+            }
+        }
+    }, [navigationDataToMarker, onNavigationStart]);
+
     return (
         <div className="search-container">
-            <div className="search-wrapper" style={{width: searchWidth}} ref={wrapperRef}>
+            {!isNavigating && <div className="search-wrapper" style={{width: searchWidth}} ref={wrapperRef}>
                 <div className="search-input-wrapper">
                     <span className="search-icon">🔍</span>
                     <input
@@ -275,13 +299,24 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
                                     >
                                         <div className="result-info">
                                             <div className="result-name">{marker.name}</div>
-                                            <div className="result-type">{marker.type?.replace('_', ' ') || 'Location'}</div>
+                                            <div
+                                                className="result-type">{marker.type?.replace('_', ' ') || 'Location'}</div>
                                         </div>
+                                        {/* Choose the start marker */}
+                                        <button
+                                            className={`result-start-btn ${selectedStartPoint?.name === marker.name ? 'active' : ''}`}
+                                            onClick={(e) => handleSelectStartPoint(e, marker)}
+                                            title={selectedStartPoint?.name === marker.name ? "Clear start point" : "Start navigation from here"}
+                                        >
+                                            🚩
+                                        </button>
+
+                                        {/* Build the navigation to the marker button */}
                                         <button
                                             className="result-route-btn"
-                                            onClick={(e) => {
+                                            onClick={async (e) => {
                                                 e.stopPropagation();
-                                                handleBuildRoute(marker);
+                                                await handleBuildRoute(marker);
                                             }}
                                             title="Build route to this location"
                                         >
@@ -291,16 +326,25 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
                                 ))}
 
                                 {/* Results counter - at the bottom */}
-                                {searchInput && searchResults.length > 0 && (
-                                    <div className="results-footer">
-                                        Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
-                                    </div>
-                                )}
+                                <div className="results-footer">
+                                    Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                                </div>
                             </>
                         )}
                     </div>
                 )}
-            </div>
+
+                {/* Selected start point indicator */}
+                {selectedStartPoint && (
+                    <div className="start-point-indicator">
+                        <span>📍 From: {selectedStartPoint.name}</span>
+                        <button onClick={() => onStartPointSelect(null)} title="Clear start point">
+                            ✕
+                        </button>
+                    </div>
+                )}
+            </div>}
+
             {isNavigating && navigationData && (
                 <NavigationBuilder
                     routeData={navigationData}
@@ -308,6 +352,7 @@ export default function SearchMarker({ markers = [], isLoading = false, routeCol
                     isActive={isNavigating}
                     onRouteComplete={handleNavigationEvent}
                     routeColor={routeColor}
+                    isRouteFromFixedPoint={navigationData.startPoint !== null}
                 />
             )}
         </div>

@@ -1,0 +1,28 @@
+/* Stop Navigation button specific positioning */
+.stopnav-button-container {
+    position: fixed;
+    top: 140px;  /* Below MyLocation button */
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Stop Navigation button specific styles - only hover override */
+.stopnav-button:hover {
+    background: #ef4444 !important;
+    border-color: #ef4444;
+    color: white;
+}
+
+/* Active state override */
+.stopnav-button:active {
+    background: #dc2626 !important;
+    transform: scale(0.95);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .stopnav-button-container {
+        top: 120px;  /* Adjusted for mobile */
+        right: 15px;
+    }
+}
