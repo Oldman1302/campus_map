@@ -40,6 +40,8 @@ async function loadCampusGraph() {
     await campus.addNode('Canteen № 3 Entrance 2', [22.363406, 113.539271], null, true, 'gate'); // point 378
     await campus.addNode('Canteen № 3 Entrance 3', [22.363576, 113.539361], null, true, 'gate'); // point 375
     await campus.addNode('Canteen № 3 Entrance 4', [22.363404, 113.539189], null, true, 'gate'); // point 375
+    await campus.addNode('Canteen № 3 Entrance 5', [22.363639, 113.539036], null, true, 'gate'); // point 410
+    await campus.addNode('Canteen № 3 Public Toilet', [22.363603, 113.539024], null, true, 'toilet'); // point 411
 
     await campus.addNode('Muslim cafe', [22.365433, 113.540379], null, true, 'cafe');
     await campus.addNode('满忆糖水', [22.365284, 113.540367], null, true, 'drink'); // point 251
@@ -58,7 +60,6 @@ async function loadCampusGraph() {
 
     await campus.addNode('China post', [22.365332, 113.541287], null, true, 'post_office'); // point 213
 
-
     await campus.addNode('Complex building', [22.366319, 113.539931], null, true, "default"); // point 263
     await campus.addNode('Complex building Xiaomian noodles', [22.366213, 113.540067], null, true, 'cafe');
     await campus.addNode('Complex building Xiaomian noodles Entrance 1', [22.366184, 113.540168], null, true, 'gate');
@@ -76,6 +77,9 @@ async function loadCampusGraph() {
     await campus.addNode('Complex building 鹏泰超市 Entrance 2', [22.366508, 113.539731], null, true, 'gate'); // point 303
     await campus.addNode('Complex building Bakery', [22.366663, 113.539764], null, true, 'supermarket'); // point 305
 
+    await campus.addNode('Fitness Standard', [22.362609, 113.535467], null, true, 'gym'); // point 425
+    await campus.addNode('Cafe in Fitness', [22.362566, 113.535393], null, true, 'cafe'); // point 423
+    await campus.addNode('Swimming pool Entrance', [22.362594, 113.535434], null, true, 'swimming_pool'); // point 424
 
 
     await campus.addNode('Building T1', [22.366198, 113.543858], null, true, 'dormitory');
@@ -169,7 +173,12 @@ async function loadCampusGraph() {
     await campus.addNode('22.367012, 113.539417', [22.367012, 113.539417], null, false); // point 351
     await campus.addNode('22.367058, 113.539414', [22.367058, 113.539414], null, false); // point 352
     await campus.addNode('22.367124, 113.539418', [22.367124, 113.539418], null, false); // point 353
+
     await campus.addNode('22.367218, 113.539396', [22.367218, 113.539396], null, false); // point 354
+    await campus.addNode('22.367388, 113.539219', [22.367388, 113.539219], null, false); // point 395
+    await campus.addNode('22.367538, 113.539186', [22.367538, 113.539186], null, false); // point 396
+    await campus.addNode('22.367520, 113.539692', [22.367520, 113.539692], null, false); // point 397
+    await campus.addNode('22.367524, 113.539776', [22.367524, 113.539776], null, false); // point 398
 
     await campus.addNode('22.366218, 113.540223', [22.366218, 113.540223], null, false);
     await campus.addNode('22.365434, 113.540308', [22.365434, 113.540308], null, false);
@@ -191,7 +200,26 @@ async function loadCampusGraph() {
     await campus.addNode('22.363369, 113.539271', [22.363369, 113.539271], null, false); // point 377
 
     await campus.addNode('22.363231, 113.539298', [22.363231, 113.539298], null, false); // point 379
+    await campus.addNode('22.363241, 113.538866', [22.363241, 113.538866], null, false); // point 394
+    await campus.addNode('22.363200, 113.538541', [22.363200, 113.538541], null, false); // point 412
+    await campus.addNode('22.363168, 113.538367', [22.363168, 113.538367], null, false); // point 413
+    await campus.addNode('22.363146, 113.538083', [22.363146, 113.538083], null, false); // point 414
+    await campus.addNode('22.362881, 113.537509', [22.362881, 113.537509], null, false); // point 415
+    await campus.addNode('22.362767, 113.537272', [22.362767, 113.537272], null, false); // point 416
+    await campus.addNode('22.362619, 113.537038', [22.362619, 113.537038], null, false); // point 417
+    await campus.addNode('22.362434, 113.536650', [22.362434, 113.536650], null, false); // point 418
+    await campus.addNode('22.362268, 113.536405', [22.362268, 113.536405], null, false); // point 419
+    await campus.addNode('22.362215, 113.536354', [22.362215, 113.536354], null, false); // point 420
+    await campus.addNode('22.362379, 113.535435', [22.362379, 113.535435], null, false); // point 421
 
+    await campus.addNode('22.362538, 113.535471', [22.362538, 113.535471], null, false); // point 422
+
+    await campus.addNode('22.363505, 113.538642', [22.363505, 113.538642], null, false); // point 405
+    await campus.addNode('22.363602, 113.538652', [22.363602, 113.538652], null, false); // point 406
+    await campus.addNode('22.363606, 113.538910', [22.363606, 113.538910], null, false); // point 407
+
+    await campus.addNode('22.363497, 113.538855', [22.363497, 113.538855], null, false); // point 408
+    await campus.addNode('22.363634, 113.538989', [22.363634, 113.538989], null, false); // point 409
 
     await campus.addNode('22.365445, 113.539863', [22.365445, 113.539863], null, false);
     await campus.addNode('22.365461, 113.540048', [22.365461, 113.540048], null, false);
@@ -388,6 +416,12 @@ async function loadCampusGraph() {
     await campus.addEdge('22.367124, 113.539418', '22.367058, 113.539414', 8, 5);
 
     await campus.addEdge('22.367124, 113.539418', '22.367218, 113.539396', 13, 11);
+    await campus.addEdge('22.367388, 113.539219', '22.367218, 113.539396', 28, 15);
+    await campus.addEdge('22.367388, 113.539219', '22.367538, 113.539186', 16, 11);
+    await campus.addEdge('22.367520, 113.539692', '22.367538, 113.539186', 54, 40);
+    await campus.addEdge('22.367520, 113.539692', '22.367524, 113.539776', 7, 4);
+
+    await campus.addEdge('22.367274, 113.539759', '22.367524, 113.539776', 28, 16);
 
     await campus.addEdge('22.365457, 113.539686', '22.365443, 113.539570', 11, 14);
     await campus.addEdge('22.365443, 113.539570', '22.365201, 113.539570', 27, 27);
@@ -424,9 +458,37 @@ async function loadCampusGraph() {
     await campus.addEdge('Canteen № 3 Entrance 2', '22.363369, 113.539271', 1, 1);
     await campus.addEdge('Canteen № 3', '22.363369, 113.539271', 10, 7);
     await campus.addEdge('Canteen № 3 Entrance 4', '22.363369, 113.539271', 10, 7);
+    await campus.addEdge('Canteen № 3 Entrance 5', '22.363634, 113.538989', 4, 2);
+    await campus.addEdge('Canteen № 3 Public Toilet', '22.363634, 113.538989', 4, 2);
+    await campus.addEdge('Canteen № 3 Entrance 5', 'Canteen № 3 Public Toilet', 1, 1);
 
     await campus.addEdge('22.363231, 113.539298', '22.363369, 113.539271', 14, 9);
     await campus.addEdge('22.363231, 113.539298', '22.363235, 113.539528', 25, 15);
+    await campus.addEdge('22.363231, 113.539298', '22.363241, 113.538866', 60, 35);
+    await campus.addEdge('22.363200, 113.538541', '22.363241, 113.538866', 11, 6);
+    await campus.addEdge('22.363200, 113.538541', '22.363168, 113.538367', 19, 12);
+    await campus.addEdge('22.363146, 113.538083', '22.363168, 113.538367', 30, 18);
+    await campus.addEdge('22.363146, 113.538083', '22.362881, 113.537509', 67, 45);
+    await campus.addEdge('22.362767, 113.537272', '22.362881, 113.537509', 29, 16);
+    await campus.addEdge('22.362767, 113.537272', '22.362619, 113.537038', 28, 20);
+    await campus.addEdge('22.362434, 113.536650', '22.362619, 113.537038', 44, 25);
+    await campus.addEdge('22.362434, 113.536650', '22.362268, 113.536405', 32, 18);
+    await campus.addEdge('22.362215, 113.536354', '22.362268, 113.536405', 8, 7);
+    await campus.addEdge('22.362215, 113.536354', '22.362379, 113.535435', 97, 65);
+
+    await campus.addEdge('22.362538, 113.535471', '22.362379, 113.535435', 16, 12);
+    await campus.addEdge('Cafe in Fitness', '22.362538, 113.535471', 9, 5);
+    await campus.addEdge('Swimming pool Entrance', '22.362538, 113.535471', 8, 5);
+    await campus.addEdge('Swimming pool Entrance', 'Cafe in Fitness', 4, 2);
+    await campus.addEdge('Fitness Standard', '22.362538, 113.535471', 10, 8);
+    await campus.addEdge('Fitness Standard', 'Swimming pool Entrance', 5, 3);
+
+    await campus.addEdge('22.363505, 113.538642', '22.363241, 113.538866', 31, 20);
+    await campus.addEdge('22.363505, 113.538642', '22.363602, 113.538652', 12, 8);
+
+    await campus.addEdge('22.363606, 113.538910', '22.363602, 113.538652', 26, 16);
+    await campus.addEdge('22.363606, 113.538910', '22.363497, 113.538855', 14, 8);
+    await campus.addEdge('22.363606, 113.538910', '22.363634, 113.538989', 11, 8);
 
     await campus.addEdge('Dormitory №20 Entrance 1', '22.365189, 113.539670', 14, 10);
     await campus.addEdge('Dormitory №19 Entrance 1', '22.365189, 113.539670', 18, 3);
@@ -493,7 +555,7 @@ async function loadCampusGraph() {
     // const result = await campus.dijkstra('Dormitory №20 Entrance 2', 'distance');
     //
     // console.log('\n\ndijkstra:')
-        // console.log(result['East gate']); // print the specific node result
+    // console.log(result['East gate']); // print the specific node result
     //
     //
     // // Run Dijkstra for all nodes
