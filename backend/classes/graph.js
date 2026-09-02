@@ -45,6 +45,13 @@ class Graph {
         }
     }
 
+    async getNode(name) {
+        if (!this.nodes.has(name)) {
+            return undefined;
+        }
+        return this.nodes.get(name).description;
+    }
+
     /**
      * Returns all graph nodes
      *

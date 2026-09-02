@@ -189,6 +189,33 @@ async function startServer(port) {
     })
 
     /**
+     * GET-request to obtain the node by its name
+     *
+     * GET /node:name
+     */
+    app.get("/node/:name", (req, res) => {
+        const name = req.params.name;
+
+        graph.getNode(req.params.name).then((result) => {
+            if (result === undefined) {
+                return res.status(404).json({ error: "Node not found" });
+            }
+
+            const edgesObj = {};
+            if (result.edges instanceof Map) {
+                for (const [key, value] of result.edges) {
+                    edgesObj[key.name] = value;
+                }
+            }
+
+            return res.json({
+                ...result,
+                edges: edgesObj
+            });
+        })
+    })
+
+    /**
      * GET /
      * Returns all nodes from graph.
      */

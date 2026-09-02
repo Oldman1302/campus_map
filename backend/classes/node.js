@@ -53,6 +53,15 @@ class Node {
 
         return this.edges.delete(neighborNode);
     }
+
+    get description(){
+        return {
+            name: this.name,
+            coordinates: this.coordinates,
+            type: this.type,
+            edges: this.edges
+        }
+    }
 }
 
 module.exports = Node;
