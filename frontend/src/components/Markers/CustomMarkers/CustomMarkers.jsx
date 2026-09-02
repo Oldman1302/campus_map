@@ -25,7 +25,7 @@ export default function CustomMarkers({ markers=[], onMarkerClick }) {
         if (!map || !markers.length) return;
 
         // Filter only building markers
-        const buildingMarkers = markers.filter(point => point.isBuilding === true);
+        const buildingMarkers = markers.filter(point => point.isBuilding === true || point?.type);
 
         if (buildingMarkers.length === 0) {
             console.log('No building markers to display');

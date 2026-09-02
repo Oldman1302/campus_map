@@ -63,7 +63,7 @@ export default function NavigationBuilder({
     }, [findClosestPointOnRoute]);
 
     // Calculate remaining time and distance based on current position
-    const calculateRemainingStats = useCallback((userPos, pathNodes, distances, times) => {
+    const calculateRemainingStats = useCallback((userPos, pathNodes, distances, times, isRouteFromFixedPoint) => {
         if (!pathNodes || !distances || !times || distances.length === 0) {
             return {
                 leftTime: 0,
@@ -85,7 +85,12 @@ export default function NavigationBuilder({
             }
         }).filter(coordinate => coordinate !== null);
 
-        const { closestIndex } = findClosestPointOnRoute(userPos, routeCoordinates);
+        let closestIndex;
+        if (isRouteFromFixedPoint) {
+            closestIndex = 0;
+        } else {
+            closestIndex = findClosestPointOnRoute(userPos, routeCoordinates).closestIndex;
+        }
 
         let leftDistance = 0;
         let leftTime = 0;
@@ -261,7 +266,8 @@ export default function NavigationBuilder({
                     userLatLng,
                     navigationRef.current.pathNodes,
                     navigationRef.current.distances,
-                    navigationRef.current.times
+                    navigationRef.current.times,
+                    isRouteFromFixedPoint
                 );
 
                 // Send updates to parent
